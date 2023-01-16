@@ -1,22 +1,20 @@
+from sqlalchemy import Column, String, Integer
 from User.User import User
-from User.jobTitle import JobTitle
+from sqlalchemy.ext.declarative import declarative_base
+
+Base = declarative_base()
 
 
 class Labor(User):
-    def __init__(self, ID: str, name: str, username: str, houseNu: int,
-                 farmName: str):
-        super().__init__(ID, name, username, jobTitle=JobTitle.LABOR)
-        self.__houseNu = houseNu
-        self.__farmName = farmName
+    __tablename__ = 'labors'
 
-    def setHouseNu(self, houseNu: int):
-        self.__houseNu = houseNu
+    id = Column(Integer, primary_key=True)
+    houseNu = Column(Integer)
+    farmName = Column(String)
 
-    def getHouseNu(self):
-        return self.__houseNu
+    def __init__(self, name, username, jobTitle, houseNu, farmName):
+        super().__init__(name, username, jobTitle)
+        self.houseNu = houseNu
+        self.farmName = farmName
 
-    def setFarmName(self, farmName: str):
-        self.__farmName = farmName
 
-    def getFarmName(self):
-        return self.__farmName
