@@ -2,7 +2,7 @@ from User.jobTitle import JobTitle
 
 
 class User:
-    def __init__(self, ID: str, name: str, username: str, jobTitle: JobTitle):
+    def __init__(self, ID: int, name: str, username: str, jobTitle: JobTitle):
         self.__ID = ID
         self.__name = name
         self.__username = username
