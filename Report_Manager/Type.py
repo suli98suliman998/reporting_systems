@@ -1,4 +1,6 @@
 from enum import Enum
+
+
 class Type(Enum):
     Daily_Barn = 1
     DFS = 2

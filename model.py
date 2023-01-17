@@ -4,7 +4,7 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 from sqlalchemy import Column, Integer, ForeignKey, String, PrimaryKeyConstraint, Enum, DateTime
-from Report_Manager.Type import Type
+
 from User.jobTitle import JobTitle
 
 basedir = os.path.abspath(os.path.dirname(__file__))
@@ -13,14 +13,13 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = \
     'sqlite:///' + os.path.join(basedir, 'database.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
 db = SQLAlchemy(app)
 
 
 class Users(db.Model):
     __tablename__ = 'users'
 
-    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, primary_key=True)
     name = Column(String)
     username = Column(String)
     jobTitle = Column(Enum(JobTitle))
@@ -40,8 +39,8 @@ users_schema = UserSchema(many=True)
 class Labor(Users):
     __tablename__ = 'labors'
 
-    id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
+    labor_id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.user_id"))
     houseNu = Column(Integer)
     farmName = Column(String)
 
@@ -61,7 +60,7 @@ class Form(db.Model):
     __tablename__ = 'form'
     form_id = Column(Integer, primary_key=True)
     template_id = Column(Integer, ForeignKey('template.template_id'))
-    filled_by = Column(Integer, ForeignKey('users.id'))
+    filled_by = Column(Integer, ForeignKey('users.user_id'))
     farm_name = Column(String)
     barn_number = Column(Integer)
     metadata_id = Column(Integer, ForeignKey('metadata.metadata_id'))
@@ -114,10 +113,63 @@ Metadata_Schema = MetadataSchema()
 Metadatas_Schema = MetadataSchema(many=True)
 
 
+class Template(db.Model):
+    __tablename__ = 'template'
+    template_id = Column(Integer, primary_key=True)
+    type = Column(String)
+
+    def __init__(self, template_name):
+        self.template_name = template_name
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
+
+class TemplateSchema(SQLAlchemyAutoSchema):
+    class Meta:
+        model = Template
+        include_relationships = True
+        load_instance = True
+
+
+template_schema = TemplateSchema()
+templates_schema = TemplateSchema(many=True)
+
+
+class TemplateRow(db.Model):
+    __tablename__ = 'template_row'
+    template_id = Column(Integer, ForeignKey('template.template_id'), primary_key=True)
+    row_title = Column(String, primary_key=True)
+    __table_args__ = (PrimaryKeyConstraint(template_id, row_title),)
+
+    def __init__(self, template_id, row_name):
+        self.template_id = template_id
+        self.row_name = row_name
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
+
+class TemplateRowSchema(SQLAlchemyAutoSchema):
+    class Meta:
+        model = TemplateRow
+        include_relationships = True
+        load_instance = True
+
+
+# Template.rows = relationship("TemplateRow", back_populates="row_title")
+# TemplateRow.template = relationship("Template", back_populates="rows")
+
+template_rows_schema = TemplateRowSchema()
+template_rowss_schema = TemplateRowSchema(many=True)
+
+
 class SubmittedData(db.Model):
     __tablename__ = 'submitted_data'
-    template_id = Column(Integer, ForeignKey("template_rows.template_id"), primary_key=True)
-    row_title = Column(String, ForeignKey("template_rows.row_title"), primary_key=True)
+    template_id = Column(Integer, ForeignKey("template_row.template_id"), primary_key=True)
+    row_title = Column(String, ForeignKey("template_row.row_title"), primary_key=True)
     form_id = Column(Integer, ForeignKey("form_columns.form_id"), primary_key=True)
     column_title = Column(String, ForeignKey("form_columns.column_title"), primary_key=True)
     data = Column(String)
@@ -134,36 +186,5 @@ class SubmittedDataSchema(SQLAlchemyAutoSchema):
 submitted_data_schema = SubmittedDataSchema()
 submitted_datas_schema = SubmittedDataSchema(many=True)
 
-
-class Template(db.Model):
-    __tablename__ = 'template'
-    template_id = Column(Integer, primary_key=True)
-    type = Column(Enum(Type))
-
-
-class TemplateSchema(SQLAlchemyAutoSchema):
-    class Meta:
-        model = Template
-        include_relationships = True
-        load_instance = True
-
-
-template_schema = TemplateSchema()
-templates_schema = TemplateSchema(many=True)
-
-
-class TemplateRows(db.Model):
-    __tablename__ = 'template_rows'
-    template_id = Column(Integer, ForeignKey('template.template_id'), primary_key=True)
-    row_title = Column(String, primary_key=True)
-
-
-class TemplateRowsSchema(SQLAlchemyAutoSchema):
-    class Meta:
-        model = TemplateRows
-        include_relationships = True
-        load_instance = True
-
-
-template_rows_schema = TemplateRowsSchema()
-template_rowss_schema = TemplateRowsSchema(many=True)
+with app.app_context():
+    db.create_all()

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Form Builder</title>
+  </head>
+  <body>
+    <form>
+      <table>
+        <thead>
+          <tr>
+            {% for column_name in column_names %}
+              <th>{{ column_name }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for row_name in row_names %}
+            <tr>
+              <td>{{ row_name }}</td>
+              {% for column_name in column_names %}
+                <td><input type="text" name="{{ row_name }}_{{ column_name }}"></td>
+              {% endfor %}
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <input type="submit" value="Submit">
+    </form>
+  </body>
+</html>
