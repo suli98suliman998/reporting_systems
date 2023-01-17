@@ -1,7 +1,7 @@
 from sqlalchemy import Integer, Column, ForeignKey, String
 from sqlalchemy.orm import relationship
 
-from db import Base
+from model import Base
 
 
 class GeneratedReport(Base):

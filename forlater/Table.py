@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String
 
 from forlater.Report import Report
-from db import Base
+from model import Base
 
 
 class Table(Base):
