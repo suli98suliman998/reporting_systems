@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String
 
-from Report_Manager.Report import Report
+from forlater.Report import Report
 from db import Base
 
 

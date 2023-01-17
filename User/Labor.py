@@ -1,5 +1,6 @@
+from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 from sqlalchemy import Column, String, Integer
-from User.User import User
+from User.Users import User
 from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
@@ -17,4 +18,8 @@ class Labor(User):
         self.houseNu = houseNu
         self.farmName = farmName
 
-
+class LaborSchema(SQLAlchemyAutoSchema):
+    class Meta:
+        model = Labor
+        include_relationships = True
+        load_instance = True

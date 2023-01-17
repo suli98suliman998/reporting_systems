@@ -5,7 +5,7 @@ from sqlalchemy.dialects.postgresql import Any
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
 
-from Report_Manager.Table import Table
+from forlater.Table import Table
 from Report_Manager.Type import Type
 
 Base = declarative_base()

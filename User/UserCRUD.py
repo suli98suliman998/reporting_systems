@@ -1,5 +1,5 @@
 from User.Labor import Labor
-from User.User import User
+from User.Users import User
 from db import Session
 
 

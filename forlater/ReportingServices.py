@@ -1,7 +1,7 @@
 import datetime
 
 from Report_Manager.Form import Form
-from Report_Manager.Report import Report
+from forlater.Report import Report
 from Report_Manager.Type import Type
 
 

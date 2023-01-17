@@ -1,3 +1,4 @@
+from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 from sqlalchemy import Column, String, Enum, Integer
 from sqlalchemy.dialects.postgresql import Any
 
@@ -7,7 +8,7 @@ from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
 
 
-class User(Base):
+class Users(Base):
     __tablename__ = 'users'
 
     id = Column(Integer, primary_key=True)
@@ -22,3 +23,12 @@ class User(Base):
         self.jobTitle = jobTitle
 
 
+class UserSchema(SQLAlchemyAutoSchema):
+    class Meta:
+        model = Users
+        include_relationships = True
+        load_instance = True
+
+
+user_schema = UserSchema()
+users_schema = UserSchema(many=True)
