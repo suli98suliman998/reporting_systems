@@ -1,33 +1,34 @@
+from sqlalchemy import Column, Integer, String
+
 from Report_Manager.Report import Report
+from db import Base
 
 
-class Table:
-    def __init__(self):
-        self.__columnTitles = []
-        self.__rowTitles = []
-        self.__tableContent = []
-        self.currentRow = 0
+class Table(Base):
+    __tablename__ = 'table'
+    id = Column(Integer, primary_key=True)
+    column_titles = Column(String)
+    row_titles = Column(String)
+    table_content = Column(Integer, default=0)
 
-    def set_column_titles(self, titles: [str]):
-        self.__columnTitles = titles
-
-    def set_row_titles(self, titles: [str]):
-        self.__rowTitles = titles
-
-    def set_table_content(self, content: [[str]]):
-        self.__tableContent = content
-
-    def get_column_titles(self):
-        return self.__columnTitles
-
-    def get_row_titles(self):
-        return self.__rowTitles
-
-    def get_table_content(self):
-        return self.__tableContent
-
-    def fillRow(self):
+    def fillRow(self, column_title, row_title, data):
         pass
 
-    def build_table(self, report: Report):
+    def buildTable(self, report: Report):
         pass
+
+    def setColumnTitles(self, titles: [str]):
+        self.column_titles = titles
+
+    def setRowTitles(self, titles: [str]):
+        self.row_titles = titles
+
+    def setTableContent(self, content: [[str]]):
+        self.table_content = content
+
+    def getColumnTitles(self):
+        return self.column_titles
+
+    def getRowTitles(self):
+        return self.row_titles
+

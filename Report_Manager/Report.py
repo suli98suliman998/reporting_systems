@@ -1,57 +1,61 @@
 import datetime
+
+from sqlalchemy import Column, Integer, ForeignKey, Enum, String, DateTime
+from sqlalchemy.dialects.postgresql import Any
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import relationship
+
 from Report_Manager.Table import Table
 from Report_Manager.Type import Type
 
+Base = declarative_base()
 
-class Report:
-    def __init__(self, ID: int, title: str, reportType: Type, date: datetime, cycle: int, filledBy: int,
-                 reviewedBy: int, userAccessList: [int], tableData: Table):
-        self._ID = ID
-        self._title = title
-        self._type = reportType
-        self._date = date
-        self._cycle = cycle
-        self._filledBy = filledBy
-        self._reviewedBy = reviewedBy
-        self._userAccessList = userAccessList
-        self._tableData = tableData
 
-    def set_reviewedBy(self, reviewedBy: int):
-        self._reviewedBy = reviewedBy
+class Report(Base):
+    __tablename__ = 'report'
+    id = Column(Integer, primary_key=True)
+    title = Column(String)
+    type = Column(Enum(Type))
+    date = Column(DateTime, default=datetime.datetime.utcnow)
+    cycle = Column(Integer)
+    reviewed_by = Column(Integer, ForeignKey('user.id'))
+    user_access = Column(String)
+    table_data = Column(Integer, ForeignKey('table.id'))
+    report_column = relationship("ReportColumn", back_populates="report")
+    generated_report = relationship("GeneratedReport", back_populates="report")
 
-    def validate_authority_to_review(self, user_id):
-        if user_id in self._userAccessList:
-            return True
-        else:
-            return False
+    def __init__(self, title: str, type: Type, cycle: int, *args: Any, **kwargs: Any):
+        super().__init__(*args, **kwargs)
+        self.title = title
+        self.type = type
+        self.cycle = cycle
 
-    def set_access_list(self, users: [int]):
-        self._userAccessList = users
+    def setReviewedBy(self, user_id: int):
+        self.reviewed_by = user_id
 
-    def set_table_data(self, table: Table):
-        self._tableData = table
+    def setTableData(self, table: Table):
+        self.table_data = table
 
-    def get_ID(self):
-        return self._ID
+    def validateAccessToReview(self):
+        pass
 
-    def get_title(self):
-        return self._title
+    def getID(self):
+        return self.id
 
-    def get_type(self):
-        return self._type
+    def getTitle(self):
+        return self.title
 
-    def get_date(self):
-        return self._date
+    def getType(self):
+        return self.type
 
-    def get_cycle(self):
-        return self._cycle
+    def getCycle(self):
+        return self.cycle
 
-    def get_reviewed_by(self):
-        return self._reviewedBy
+    def getReviewdBy(self):
+        return self.reviewed_by
 
-    def get_user_access_list(self):
-        return self._userAccessList
+    def getTableData(self):
+        return self.table_data
 
-    def get_table_data(self):
-        return self._tableData
-
+    def getUserAccessList(self):
+        return self.user_access
