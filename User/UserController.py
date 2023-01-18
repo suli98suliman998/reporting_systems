@@ -5,7 +5,6 @@ from model import Users, Labor, db
 
 def controller_create_labor():
     if request.method == 'POST':
-        print("11s")
         name = request.form.get('name')
         username = request.form.get('username')
         farmName = request.form.get("farmName")
@@ -20,7 +19,6 @@ def controller_create_labor():
 
 def controller_create_user():
     if request.method == 'POST':
-        print(111111)
         name = request.form.get('name')
         username = request.form.get('username')
         jobTitle = request.form.get('jobTitle')

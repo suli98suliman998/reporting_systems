@@ -69,6 +69,7 @@ class Form(db.Model):
     filled_by = Column(Integer, ForeignKey('users.user_id'))
     farm_name = Column(String)
     barn_number = Column(Integer)
+    cycle_number = Column(String)
     metadata_id = Column(Integer, ForeignKey('metadata.metadata_id'))
 
 
@@ -164,9 +165,6 @@ class TemplateRowSchema(SQLAlchemyAutoSchema):
         include_relationships = True
         load_instance = True
 
-
-# Template.rows = relationship("TemplateRow", back_populates="row_title")
-# TemplateRow.template = relationship("Template", back_populates="rows")
 
 template_rows_schema = TemplateRowSchema()
 template_rowss_schema = TemplateRowSchema(many=True)
