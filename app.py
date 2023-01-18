@@ -1,6 +1,6 @@
 from flask import jsonify, render_template
 
-from Report_Manager.FormModel import build_form
+
 from Report_Manager.TemplateModel import get_row_titles_by_template_id
 
 from model import app
@@ -13,9 +13,15 @@ def get_template_rows(template_id):
     return jsonify(row_titles)
 
 
-@app.route('/labor_form')
+# @app.route('/labor_form')
+# def view_labor_form():
+#     return build_form(1)
+
+
+@app.route('/labor_pre_form', methods=['GET', 'POST'])
 def view_labor_form():
-    return build_form(1)
+    from Report_Manager.FormController import controller_daily_barn_pre_form
+    return controller_daily_barn_pre_form()
 
 
 @app.route('/home')

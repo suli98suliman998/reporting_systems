@@ -11,7 +11,6 @@ def get_form_columns_by_form_id(form_id):
     return [column[0] for column in form_columns]
 
 
-def build_form(form_id):
-    column_names = get_form_columns_by_form_id(form_id)
-    row_names = get_row_titles_by_template_id(form_id)
-    return render_template('form_builder.html', column_names=column_names, row_names=row_names)
+
+
+
