@@ -72,6 +72,10 @@ class Form(db.Model):
     cycle_number = Column(String)
     metadata_id = Column(Integer, ForeignKey('metadata.metadata_id'))
 
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
 
 class FormSchema(SQLAlchemyAutoSchema):
     class Meta:
@@ -107,6 +111,15 @@ class Metadata(db.Model):
     date = Column(DateTime, default=datetime.datetime.utcnow)
     time = Column(String)
     title = Column(String)
+
+    def __init__(self, date, time, title):
+        self.date = date
+        self.time = time
+        self.title = title
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
 
 
 class MetadataSchema(SQLAlchemyAutoSchema):
