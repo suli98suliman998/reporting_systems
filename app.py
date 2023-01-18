@@ -1,8 +1,10 @@
-from flask import request, jsonify, render_template
+from flask import jsonify, render_template
 
+from User import UserController
 from Report_Manager.FormModel import get_form_columns_by_form_id
 from Report_Manager.TemplateModel import get_row_titles_by_template_id
-from model import app, TemplateRow, db
+from User.UserController import controller_create_user
+from model import app
 
 
 @app.route('/template/<int:template_id>/rows')
@@ -17,6 +19,16 @@ def build_form(form_id):
     column_names = get_form_columns_by_form_id(form_id)
     row_names = get_row_titles_by_template_id(form_id)
     return render_template('form_builder.html', column_names=column_names, row_names=row_names)
+
+
+@app.route('/home')
+def home():
+    return render_template('index.html')
+
+
+@app.route('/register', methods=['GET', 'POST'])
+def view_registration():
+    return controller_create_user()
 
 
 if __name__ == '__main__':

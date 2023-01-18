@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+  <div class="container">
+    <h1>Hi {{session.username}}!!</br></br> Welcome to the index page...</h1>
+    <p>This is the homepage</p>
+{#    <a href="{{ url_for('view_authenticate_logout') }}" class="btn">Logout</a>#}
+  </div>
+{% endblock %}
+
+{#<html>#}
+{#  <head>#}
+{#    <title>Relay Control</title>#}
+{#  </head>#}
+{#  <body>#}
+{#    <h1>Relay Control</h1>#}
+{#    {% for relay in relays %}#}
+{#      <p>Relay {{ relay.num }} (GPIO {{ relay.gpio }})</p>#}
+{#      <form action="/update" method="GET">#}
+{#        <input type="hidden" name="relay" value="{{ relay.num-1 }}">#}
+{#        <label for="on">On</label>#}
+{#        <input type="radio" id="on" name="state" value="on" {{ relay.state }}>#}
+{#        <label for="off">Off</label>#}
+{#        <input type="radio" id="off" name="state" value="off" {{ "" if relay.state else "checked" }}>#}
+{#        <input type="submit" value="Update">#}
+{#      </form>#}
+{#    {% endfor %}#}
+{#  </body>#}
+{#</html>#}

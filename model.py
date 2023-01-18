@@ -5,8 +5,6 @@ from flask_sqlalchemy import SQLAlchemy
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 from sqlalchemy import Column, Integer, ForeignKey, String, PrimaryKeyConstraint, Enum, DateTime
 
-from User.jobTitle import JobTitle
-
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 app = Flask(__name__)
@@ -22,7 +20,11 @@ class Users(db.Model):
     user_id = Column(Integer, primary_key=True)
     name = Column(String)
     username = Column(String)
-    jobTitle = Column(Enum(JobTitle))
+    jobTitle = Column(String)
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
 
 
 class UserSchema(SQLAlchemyAutoSchema):
@@ -36,13 +38,17 @@ user_schema = UserSchema()
 users_schema = UserSchema(many=True)
 
 
-class Labor(Users):
+class Labor(db.Model):
     __tablename__ = 'labors'
 
     labor_id = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey("users.user_id"))
     houseNu = Column(Integer)
     farmName = Column(String)
+
+    def labor_save(self):
+        db.session.add(self)
+        db.session.commit()
 
 
 class LaborSchema(SQLAlchemyAutoSchema):
