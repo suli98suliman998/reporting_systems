@@ -13,6 +13,7 @@ def controller_daily_barn_pre_form():
         date = datetime.date
 
         rows = get_row_titles_by_template_id(1)
+        print(rows)
         return redirect(url_for('view_labor_form', columns=shift, rows=rows))
     shifts = ["6:00 -> 9:00", "9:00 -> 12:00", "12:00 -> 15:00", "15:00 -> 18:00"]
     return render_template('daily_barn_pre_data.html', shifts=shifts)

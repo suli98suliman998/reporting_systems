@@ -12,10 +12,12 @@ def get_template_rows(template_id):
     return jsonify(row_titles)
 
 
-@app.route('/labor_form')
+@app.route('/labor_form', methods=['GET', 'POST'])
 def view_labor_form():
     columns = request.args.get("columns")
     rows = request.args.get("rows")
+    print(columns)
+    print(rows)
     return render_template('form_builder.html', column_names=columns, row_names=rows)
 
 
