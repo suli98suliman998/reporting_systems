@@ -1,20 +1,15 @@
-from flask import jsonify, render_template, request
+from flask import jsonify, render_template
 
 from Report_Manager.TemplateModel import get_row_titles_by_template_id
-
 from model import app
 
 
-@app.route('/template/<int:template_id>/rows')
-def get_template_rows(template_id):
-    row_titles = get_row_titles_by_template_id(template_id)
-
-    return jsonify(row_titles)
-
-
-@app.route('/labor_form', methods=['GET', 'POST'])
-def view_labor_form(columns, rows):
-    return render_template('form_builder.html', column_names=columns, row_names=rows)
+@app.route('/labor_form/<shift>', methods=['GET', 'POST'])
+def view_labor_form(shift):
+    rows = get_row_titles_by_template_id(1)
+    print(rows)
+    print([shift])
+    return render_template('form_builder.html', column_names=[shift], row_names=rows)
 
 
 @app.route('/labor_pre_form', methods=['GET', 'POST'])
