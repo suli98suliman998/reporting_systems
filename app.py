@@ -17,10 +17,13 @@ def get_template_rows(template_id):
 @app.route('/form/<int:form_id>')
 def build_form(form_id):
     column_names = get_form_columns_by_form_id(form_id)
-    for i in column_names:
-        print(i)
     row_names = get_row_titles_by_template_id(form_id)
     return render_template('form_builder.html', column_names=column_names, row_names=row_names)
+
+
+@app.route('/labor_form')
+def view_labor_form():
+    return build_form(1)
 
 
 @app.route('/home')
