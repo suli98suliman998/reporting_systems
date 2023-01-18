@@ -12,6 +12,12 @@ def view_labor_form(shift):
     return render_template('form_builder.html', column_names=[shift], row_names=rows)
 
 
+@app.route('/form/<type>', methods=['GET', 'POST'])
+def view_form(type):
+    from Report_Manager.Reporting_services import get_form
+    return get_form(type)
+
+
 @app.route('/labor_pre_form', methods=['GET', 'POST'])
 def view_labor_pre_form():
     from Report_Manager.FormController import controller_daily_barn_pre_form

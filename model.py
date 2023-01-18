@@ -171,6 +171,13 @@ class TemplateRow(db.Model):
         db.session.add(self)
         db.session.commit()
 
+    @staticmethod
+    def get_template_id_by_type(template_type):
+        template = Template.query.filter_by(template_type=template_type).first()
+        if template:
+            return template.template_id
+        else:
+            return None
 
 class TemplateRowSchema(SQLAlchemyAutoSchema):
     class Meta:
