@@ -10,11 +10,9 @@ def controller_create_user():
         jobTitle = request.form.get('jobTitle')
 
         new_user = Users(name=name, username=username, jobTitle=jobTitle)
-        new_user.save()
-        print(1)
+        db.session.add(new_user)
+        db.session.commit()
         if jobTitle == 'Labor':
-            print(2)
-            print(new_user.user_id)
             houseNu = request.form.get('houseNu')
             farmName = request.form.get('farmName')
             new_labor = Labor(user_id=new_user.user_id, houseNu=houseNu, farmName=farmName)
@@ -23,4 +21,4 @@ def controller_create_user():
         return "Done"
     job_titles = ['Labor', 'Farm Supervisor', 'Farm Eng', 'Regional Manager', 'Operation Manager', 'COO', 'CEO',
                   'Sales Manager']
-    return render_template('register.html', job_titles=job_titles)
+    return render_template('register_user.html', job_titles=job_titles)

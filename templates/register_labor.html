@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <form action="/register_labor" method="post">
+        <div class="form-group">
+            <label for="name"><span class="text-danger">*</span>Name:</label>
+            <input type="text" class="form-control" name="name" required><br>
+        </div>
+        <div class="form-group">
+            <label for="username"><span class="text-danger">*</span>Username:</label>
+            <input type="text" class="form-control" name="username" required><br>
+        </div>
+        <div class="form-group">
+            <label for="houseNu"><span class="text-danger">*</span>House Number:</label>
+            <input type="text" name="houseNu" class="form-control" required><br>
+        </div>
+        <div class="form-group">
+            <label for="farmName"><span class="text-danger">*</span>Farm Name:</label>
+            <input type="text" name="farmName" class="form-control" required><br>
+        </div>
+        <button type="submit" class="btn btn-default">Submit</button>
+    </form>
+</div>
+{% endblock %}

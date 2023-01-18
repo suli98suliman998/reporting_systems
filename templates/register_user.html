@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <form action="/register_user" method="post">
+        <div class="form-group">
+            <label for="name"><span class="text-danger">*</span>Name:</label>
+            <input type="text" class="form-control" name="name" required><br>
+        </div>
+        <div class="form-group">
+            <label for="username"><span class="text-danger">*</span>Username:</label>
+            <input type="text" class="form-control" name="username" required><br>
+        </div>
+        <div class="form-group">
+            <label for="jobTitle"><span class="text-danger">*</span>Job Title:</label>
+            <select name="jobTitle" class="form-control" required>
+                {% for title in job_titles %}
+                    <option value="{{ title }}">{{ title }}</option>
+                {% endfor %}
+            </select><br>
+        </div>
+        <button type="submit" class="btn btn-default">Submit</button>
+
+    </form>
+</div>
+{% endblock %}
