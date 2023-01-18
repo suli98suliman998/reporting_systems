@@ -30,32 +30,14 @@ def home():
 
 @app.route('/register_user', methods=['GET', 'POST'])
 def view_user_registration():
-    if request.method == 'POST':
-        print(111111)
-        name = request.form.get('name')
-        username = request.form.get('username')
-        jobTitle = request.form.get('jobTitle')
-        UserModel.db_create_user(name, username, jobTitle)
-        return "Done"
-    job_titles = ['Farm Supervisor', 'Farm Eng', 'Regional Manager', 'Operation Manager', 'COO', 'CEO',
-                  'Sales Manager']
-    return render_template('register_user.html', job_titles=job_titles)
+    from User.UserController import controller_create_user
+    return controller_create_user()
 
 
 @app.route('/register_labor', methods=['GET', 'POST'])
 def view_labor_registration():
-    print(11)
-    if request.method == 'POST':
-        print("11s")
-        name = request.form.get('name')
-        username = request.form.get('username')
-        farmName = request.form.get("farmName")
-        barnNumber = request.form.get("houseNu")
-        UserModel.db_create_labor(name, username, farmName, barnNumber)
-        return "Done"
-    job_titles = ['Farm Supervisor', 'Farm Eng', 'Regional Manager', 'Operation Manager', 'COO', 'CEO',
-                  'Sales Manager']
-    return render_template('register_labor.html', job_titles=job_titles)
+    from User.UserController import controller_create_labor
+    return controller_create_labor()
 
 
 if __name__ == '__main__':
