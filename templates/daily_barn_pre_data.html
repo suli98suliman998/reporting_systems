@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
     <div class="container">
-    <form action="/labor_pre_form" method="post">
+        <form action="/labor_pre_form" method="post">
         <div class="form-group">
             <label for="cycle_number"><span class="text-danger">*</span>Cylce Number:</label>
             <input type="text" class="form-control" name="cycle_number" required><br>
@@ -12,6 +12,6 @@
                 {% endfor %}
         </select><br>
         <button type="submit" class="btn btn-default">Next</button>
-    </form>
+        </form>
 </div>
 {% endblock %}

@@ -224,5 +224,33 @@ class SubmittedDataSchema(SQLAlchemyAutoSchema):
 submitted_data_schema = SubmittedDataSchema()
 submitted_datas_schema = SubmittedDataSchema(many=True)
 
+
+class Farm(db.Model):
+    __tablename__ = 'farm'
+    farm_id = Column(Integer, primary_key=True)
+    farm_name = Column(String)
+    total_barn_count = Column(Integer)
+    area = Column(String)
+
+    def __init__(self, farm_name, total_barn_count, area):
+        self.farm_name = farm_name
+        self.total_barn_count = total_barn_count
+        self.area = area
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
+
+class FarmSchema(SQLAlchemyAutoSchema):
+    class Meta:
+        model = Farm
+        include_relationships = True
+        load_instance = True
+
+
+famr_schema = FarmSchema()
+farms_schema = FarmSchema(many=True)
+
 with app.app_context():
     db.create_all()
