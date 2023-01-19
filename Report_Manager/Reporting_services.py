@@ -35,27 +35,18 @@ def submit_form(form_id):
     from flask import request
     if request.method == "POST":
         form = get_form_by_id(form_id)
-        print(form)
-        print("submit triggred")
         columns = get_row_titles_by_template_id(template_id=form.template_id)
-        print(columns)
         column_titles = [column for column in columns]
-        form_data = {}
-        print(columns)
-        print(column_titles)
-        for column in column_titles:
-            print(column)
-            form_data[column] = request.form.get(column)
-        form = Form.query.filter_by(form_id=form.form_id).first()
         template_id = form.template_id
         template_rows = FormColumns.query.filter_by(form_id=form_id).all()
         row_titles = [row.column_title for row in template_rows]
         for column in column_titles:
             for row in row_titles:
-                data = request.form.get(row+"-"+column)
-                print(template_id, column, form_id, row, data)
+                form_data = {}
+                data = form_data[column] = request.form.get(column + "-" + row)
                 submitted_data = SubmittedData(template_id=template_id, column_title=column, form_id=form.form_id, row_title=row, data=data)
                 db.session.add(submitted_data)
                 db.session.commit()
         return redirect("/success")
+
 

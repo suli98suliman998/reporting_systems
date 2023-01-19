@@ -1,35 +1,35 @@
 {% extends "base.html" %}
 {% block content %}
-    <div class="container">
-        <form action="/submit_form/{{ form_id }}" method="post" onsubmit="return submitForm()">
+<div class="container">
+    <form action="/submit_form/{{ form_id }}" method="post" onsubmit="return submitForm()">
     <input type="hidden" name="form_id" value="{{ form_id }}">
-    <table>
-        <thead>
-            <tr>
-                <th>Row Name</th>
-                {% for column in column_names %}
-                <th>{{ column }}</th>
+        <table>
+            <thead>
+                <tr>
+                    <th>Row Name</th>
+                    {% for column in column_names %}
+                        <th>{{ column }}</th>
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in row_names %}
+                    <tr>
+                        <td>{{ row }}</td>
+                            {% for column in column_names %}
+                                <td><input type="text" name="{{ row }}-{{ column }}"></td>
+                            {% endfor %}
+                        </tr>
                 {% endfor %}
-            </tr>
-        </thead>
-        <tbody>
-            {% for row in row_names %}
-            <tr>
-                <td>{{ row }}</td>
-                {% for column in column_names %}
-                <td><input type="text" name="{{ row }}-{{ column }}"></td>
-                {% endfor %}
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+            </tbody>
+        </table>
     <input type="submit" value="Submit">
-</form>
-<script>
-    function submitForm() {
-        // Add form validation or any other logic here
-        return true;
-    }
-</script>
-    </div>
+    </form>
+    <script>
+        function submitForm() {
+            // Add form validation or any other logic here
+            return true;
+        }
+    </script>
+</div>
 {% endblock %}
