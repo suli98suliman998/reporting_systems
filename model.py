@@ -93,7 +93,9 @@ class FormColumns(db.Model):
     form_id = Column(Integer, ForeignKey('form.form_id'), primary_key=True)
     column_title = Column(String, primary_key=True)
 
-
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
 class FormColumnsSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = FormColumns
@@ -179,6 +181,7 @@ class TemplateRow(db.Model):
         else:
             return None
 
+
 class TemplateRowSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = TemplateRow
@@ -198,6 +201,17 @@ class SubmittedData(db.Model):
     column_title = Column(String, ForeignKey("form_columns.column_title"), primary_key=True)
     data = Column(String)
     __table_args__ = (PrimaryKeyConstraint('template_id', 'row_title', 'form_id', 'column_title'),)
+
+    def __init__(self, template_id, row_title, form_id, column_title, data):
+        self.template_id = template_id
+        self.row_title = row_title
+        self.form_id = form_id
+        self.column_title = column_title
+        self.data = data
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
 
 
 class SubmittedDataSchema(SQLAlchemyAutoSchema):

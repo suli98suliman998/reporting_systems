@@ -8,9 +8,11 @@ def get_row_titles_by_template_id(template_id):
     return [title[0] for title in row_titles]
 
 
-def get_template_id_by_type(value):
-    template = Template.query.filter_by(type=value).first()
+def get_template_id_by_type(template_type):
+    template = Template.query.filter_by(type=template_type).first()
+    print(template)
     if template:
+        print(template)
         return template.template_id
     else:
         return None
