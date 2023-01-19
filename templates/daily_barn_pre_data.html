@@ -7,7 +7,8 @@
             <input type="text" class="form-control" name="cycle_number" required><br>
         </div>
         <select name="shift" class="form-control" required>
-                {% for shift in shifts %}
+
+                {% for shift in ["6:00", "9:00", "12:00", "15:00", "18:00", "21:00", "24:00"] %}
                     <option value="{{ shift }}">{{ shift }}</option>
                 {% endfor %}
         </select><br>

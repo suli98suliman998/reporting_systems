@@ -44,9 +44,17 @@ def submit_form(form_id):
             for row in row_titles:
                 form_data = {}
                 data = form_data[column] = request.form.get(column + "-" + row)
-                submitted_data = SubmittedData(template_id=template_id, column_title=column, form_id=form.form_id, row_title=row, data=data)
+                submitted_data = SubmittedData(template_id=template_id, column_title=column, form_id=form.form_id,
+                                               row_title=row, data=data)
                 db.session.add(submitted_data)
                 db.session.commit()
         return redirect("/success")
 
 
+def get_total_mortality(cycle_number, farm_name, barn_number):
+    # Query the forms table for forms with the specified cycle number, farm name, and barn number
+    forms = Form.query.filter_by(cycle_number=cycle_number, farm_name=farm_name, barn_number=barn_number).all()
+    total_mortality = 0
+    for form in forms:
+        total_mortality += form.mortality
+    return total_mortality
