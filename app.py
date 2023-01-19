@@ -55,7 +55,7 @@ def get_form_data(cycle_number, farm_name, barn_number):
 
 
 @app.route('/get_data/<cycle_number>/<farm_name>/<barn_number>', methods=['GET', 'POST'])
-def get_form_data(cycle_number, farm_name, barn_number):
+def get_forms_data(cycle_number, farm_name, barn_number):
     form_data = {}
     forms_data = []
     forms = Form.query.filter_by(cycle_number=cycle_number, farm_name=farm_name, barn_number=barn_number).all()
@@ -75,8 +75,15 @@ def get_form_data(cycle_number, farm_name, barn_number):
             forms_data.append(form_data)
             form_data = {}
     print(forms_data)
+    print(get_total_mortalties(forms_data))
     return forms_data
 
+
+def get_total_mortalties(data):
+    sum = 0
+    for i in data:
+        sum = sum + int(i["Mortality"])
+    return sum
 
 def get_all_farms():
     farms = Farm.query.with_entities(Farm.farm_name).all()
