@@ -8,7 +8,7 @@
         </div>
         <select name="shift" class="form-control" required>
 
-                {% for shift in ["6:00", "9:00", "12:00", "15:00", "18:00", "21:00", "24:00"] %}
+                {% for shift in ["6:00 to 9:00", "9:00 to 12:00", "12:00 to 15:00", "15:00 to 18:00", "18:00 to 21:00", "21:00 to 24:00", "24:00 to 3:00", "3:00 to 6:00"] %}
                     <option value="{{ shift }}">{{ shift }}</option>
                 {% endfor %}
         </select><br>
