@@ -31,6 +31,30 @@ def get_form(form_type: str, cycle_number, columns):
                            row_names=template_rows)
 
 
+def get_labor_form(form_type, farm_name, barn_number, cycle_number, columns):
+    template_id = TemplateModel.get_template_id_by_type(form_type)
+    template_rows = get_row_titles_by_template_id(template_id)
+    user = get_user_info(1)  # later using session
+    filled_by = user["user_id"]
+    farmName = farm_name
+    barnNumber = barn_number
+    date = datetime.datetime.now().date()
+    time = int(datetime.datetime.now().time().hour.numerator)
+    title = form_type
+    metadata = Metadata(date=date, time=time, title=title)
+    metadata.save()
+    form = Form(template_id=template_id, filled_by=filled_by, farm_name=farmName, barn_number=barnNumber,
+                cycle_number=cycle_number,
+                metadata_id=int(metadata.metadata_id))
+    form.save()
+    form_columns = columns
+    for column in form_columns:
+        new_form_column = FormColumns(form_id=form.form_id, column_title=column)
+        new_form_column.save()
+    return render_template('form_builder.html', form_id=form.form_id, column_names=form_columns,
+                           row_names=template_rows)
+
+
 def submit_form(form_id):
     from flask import request
     if request.method == "POST":
@@ -58,3 +82,27 @@ def get_total_mortality(cycle_number, farm_name, barn_number):
     for form in forms:
         total_mortality += form.mortality
     return total_mortality
+
+
+def get_shift(shifts):
+    current_time = datetime.datetime.now().time()
+
+    if datetime.time(3, 0) <= current_time < datetime.time(6, 0):
+        shift = shifts[0]
+    elif datetime.time(6, 0) <= current_time < datetime.time(9, 0):
+        shift = shifts[1]
+    elif datetime.time(9, 0) <= current_time < datetime.time(12, 0):
+        shift = shifts[2]
+    elif datetime.time(12, 0) <= current_time < datetime.time(15, 0):
+        shift = shifts[3]
+    elif datetime.time(15, 0) <= current_time < datetime.time(18, 0):
+        shift = shifts[4]
+    elif datetime.time(18, 0) <= current_time < datetime.time(21, 0):
+        shift = shifts[5]
+    elif datetime.time(21, 0) <= current_time < datetime.time(0, 0):
+        shift = shifts[6]
+    else:
+        shift = shifts[7]
+
+    print(shift)
+    return shift

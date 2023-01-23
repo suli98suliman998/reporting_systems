@@ -1,7 +1,6 @@
 import datetime
 
 from flask import jsonify, render_template, request, url_for, redirect
-from Report_Manager.Reporting_services import submit_form, get_form
 from model import app, Farm, Form, TemplateRow, FormColumns
 
 
@@ -18,23 +17,57 @@ def is_between(shift):
     print(end_hour)
     if start_hour <= end_hour:
         return start_hour <= current_time <= end_hour
-    else: # start_hour > end_hour, assuming end hour is next day
+    else:  # start_hour > end_hour, assuming end hour is next day
         return current_time >= start_hour or current_time <= end_hour
 
 
 @app.route('/labor_pre_form', methods=['GET', 'POST'])
 def view_labor_pre_form():
+    import cv2
+    cap = None
+    shifts = ['3:00 -> 6:00', '6:00 -> 9:00', '9:00 -> 12:00', '12:00 -> 15:00', '15:00 -> 18:00', '18:00 -> 21:00',
+              '21:00 -> 24:00', '24:00 -> 3:00']
+    from Report_Manager.Reporting_services import get_shift
+    shift = get_shift(shifts)
     if request.method == 'POST':
-        cycle_number = request.form.get("cycle_number")
-        shift = request.form.get("shift")
-        columns = [shift]
-        if is_between(shift):
-            return redirect(url_for('view_form', form_type='Daily_Barn', cycle_number=cycle_number, columns=columns))
-        else:
-            return "This shift has passed"
-    from Report_Manager.FormModel import get_form_columns_by_form_id
-    shifts = get_form_columns_by_form_id(1)  # from form_coolumns
-    return render_template('daily_barn_pre_data.html', shifts=shifts)
+        cap = cv2.VideoCapture(0)
+        while True:
+            _, frame = cap.read()
+            decoded_data, _, _ = cv2.QRCodeDetector().detectAndDecode(frame)
+            if decoded_data:
+                data = decoded_data
+                farm_name, barn_number, cycle_number = data.split(",")
+                farm_name = farm_name.split(":")[1]
+                barn_number = barn_number.split(":")[1]
+                cycle_number = cycle_number.split(":")[1]
+                print(farm_name)
+                print(cycle_number)
+                print(barn_number)
+                print(shift)
+                columns = [shift]
+                return redirect(
+                    url_for('view_labor_form', form_type='Daily_Barn', farm_name=farm_name, barn_number=barn_number,
+                            cycle_number=cycle_number, columns=columns))
+            cv2.imshow("Webcam", frame)
+            key = cv2.waitKey(1)
+            if key == 27:
+                break
+    if cap:
+        cap.release()
+    cv2.destroyAllWindows()
+    return render_template('daily_barn_pre_data.html')
+
+
+@app.route('/form/labor', methods=['GET', 'POST'])
+def view_labor_form():
+    farm_name = request.args.get('farm_name')
+    cycle_number = request.args.get('cycle_number')
+    columns = request.args.getlist('columns')
+    barn_number = request.args.get('barn_number')
+    from Report_Manager.Reporting_services import get_labor_form
+    return get_labor_form(form_type='Daily_Barn', farm_name=farm_name, barn_number=barn_number,
+                          cycle_number=cycle_number,
+                          columns=columns)
 
 
 @app.route("/get_barn_count", methods=["POST"])
@@ -59,7 +92,18 @@ def view_supervisor_pre_form():
             url_for('view_form', form_type='Daily_Farm_Supervisor', cycle_number=cycle_number, columns=columns))
     from Report_Manager.FormModel import get_all_farms
     farms = get_all_farms()
-    return render_template('daily_supervisor_pre_data.html', farms=farms)
+    return render_template('daily_supervisor_pre_data.html')
+
+
+@app.route('/generate_qr', methods=['GET', 'POST'])
+def generate_qr():
+    if request.method == 'GET' or request.method == 'POST':
+        farm_name = request.form.get('farm_name')
+        barn_number = request.form.get('barn_number')
+        cycle_number = request.form.get('cycle_number')
+        from Report_Manager.Reporting_services import generate_qr_code
+        generate_qr_code(cycle_number, farm_name, barn_number)
+        return render_template('make_qr.html')
 
 
 @app.route('/tech_pre_form', methods=['GET', 'POST'])
@@ -115,11 +159,13 @@ def view_farm_pre_form():
 def view_form(form_type):
     cycle_number = request.args.get('cycle_number')
     columns = request.args.getlist('columns')
+    from Report_Manager.Reporting_services import get_form
     return get_form(form_type=form_type, cycle_number=cycle_number, columns=columns)
 
 
 @app.route('/submit_form/<form_id>', methods=['POST'])
 def submit_form_data(form_id):
+    from Report_Manager.Reporting_services import submit_form
     return submit_form(form_id)
 
 
@@ -148,13 +194,14 @@ def get_forms_data(cycle_number, farm_name, barn_number):
                                           column_title=row.row_title)
                 form_data[template_row.row_title] = data
             forms_data.append(form_data)
+
             form_data = {}
+
     print(forms_data)
-    from Buisness_Logic.Mortalities import get_total_mortalties
-    # print(get_total_mortalties(forms_data))
+    from Buisness_Logic.Mortalities import get_total_of_specefic_row
     total_mortality = str(
         "Total mortality for farm: " + farm_name + " cycle number: " + str(cycle_number) + " in barn number " + str(
-            barn_number) + "is" + str(get_total_mortalties(forms_data)))
+            barn_number) + "is" + str(get_total_of_specefic_row(forms_data)))
     return total_mortality
 
 

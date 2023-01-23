@@ -1,18 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
     <div class="container">
-        <form action="/labor_pre_form" method="post">
-        <div class="form-group">
-            <label for="cycle_number"><span class="text-danger">*</span>Cylce Number:</label>
-            <input type="text" class="form-control" name="cycle_number" required><br>
-        </div>
-        <select name="shift" class="form-control" required>
-
-                {% for shift in ["6:00 to 9:00", "9:00 to 12:00", "12:00 to 15:00", "15:00 to 18:00", "18:00 to 21:00", "21:00 to 24:00", "24:00 to 3:00", "3:00 to 6:00"] %}
-                    <option value="{{ shift }}">{{ shift }}</option>
-                {% endfor %}
-        </select><br>
-        <button type="submit" class="btn btn-default">Next</button>
+        <form method="post" action="{{ url_for('view_labor_pre_form') }}">
+            <input type="submit" value="Open Camera and Read QR Code">
         </form>
 </div>
 {% endblock %}
