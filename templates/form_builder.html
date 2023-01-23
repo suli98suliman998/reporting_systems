@@ -19,9 +19,11 @@
                             {% for column in column_names %}
                                 <td><input type="text" name="{{ row }}-{{ column }}"></td>
                             {% endfor %}
-                        </tr>
+                        <td>{{ rows_data[row] }}</td>
+                    </tr>
                 {% endfor %}
             </tbody>
+
         </table>
     <input type="submit" value="Submit">
     </form>

@@ -8,6 +8,7 @@ from model import Metadata, Form, FormColumns, TemplateRow, SubmittedData, db
 
 
 def get_form(form_type: str, cycle_number, columns):
+    from Buisness_Logic.calculate_totals import get_total_of_specefic_row
     template_id = TemplateModel.get_template_id_by_type(form_type)
     template_rows = get_row_titles_by_template_id(template_id)
     user = get_user_info(1)  # later using session
@@ -17,6 +18,23 @@ def get_form(form_type: str, cycle_number, columns):
     date = datetime.datetime.now().date()
     time = int(datetime.datetime.now().time().hour.numerator)
     title = form_type
+    rows_data = {}
+    data = get_data(farm_name=farmName, barn_number=barnNumber, cycle_number=cycle_number)
+    for i in template_rows:
+        for k in data:
+            if k.get(i) is None:
+                continue
+            else:
+                sum = get_total_of_specefic_row(data, i)
+                rows_data[i] = sum
+            break
+
+            # print(i)
+            # print(k['Mortality'])
+        # sum = get_total_of_specefic_row(data, i)
+        # rows_data.append(sum)
+    print(rows_data)
+    # print(rows_data)
     metadata = Metadata(date=date, time=time, title=title)
     metadata.save()
     form = Form(template_id=template_id, filled_by=filled_by, farm_name=farmName, barn_number=barnNumber,
@@ -28,7 +46,7 @@ def get_form(form_type: str, cycle_number, columns):
         new_form_column = FormColumns(form_id=form.form_id, column_title=column)
         new_form_column.save()
     return render_template('form_builder.html', form_id=form.form_id, column_names=form_columns,
-                           row_names=template_rows)
+                           row_names=template_rows, rows_data=rows_data)
 
 
 def get_labor_form(form_type, farm_name, barn_number, cycle_number, columns):
@@ -52,7 +70,7 @@ def get_labor_form(form_type, farm_name, barn_number, cycle_number, columns):
         new_form_column = FormColumns(form_id=form.form_id, column_title=column)
         new_form_column.save()
     return render_template('form_builder.html', form_id=form.form_id, column_names=form_columns,
-                           row_names=template_rows)
+                           row_names=template_rows, rows_data={})
 
 
 def submit_form(form_id):
@@ -84,8 +102,10 @@ def get_total_mortality(cycle_number, farm_name, barn_number):
     return total_mortality
 
 
-def get_shift(shifts):
+def get_shift():
     current_time = datetime.datetime.now().time()
+    shifts = ['3:00 -> 6:00', '6:00 -> 9:00', '9:00 -> 12:00', '12:00 -> 15:00', '15:00 -> 18:00', '18:00 -> 21:00',
+              '21:00 -> 24:00', '24:00 -> 3:00']
 
     if datetime.time(3, 0) <= current_time < datetime.time(6, 0):
         shift = shifts[0]
@@ -106,3 +126,41 @@ def get_shift(shifts):
 
     print(shift)
     return shift
+
+
+def generate_qr_code(cycle_number, farm_name, barn_number):
+    import qrcode
+    data = f'Cycle Number:{cycle_number}, Farm Name:{farm_name}, Barn Number:{barn_number}'
+    qr = qrcode.QRCode(version=1, box_size=10, border=5)
+    qr.add_data(data)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color='black', back_color='white')
+    img.save(f'qr_code_{cycle_number}_{farm_name}_{barn_number}.png')
+    print(f'QR code image saved as qr_code_{cycle_number}_{farm_name}_{barn_number}.png in the project directory')
+
+
+def get_data(farm_name, barn_number, cycle_number):
+    form_data = {}
+    forms_data = []
+    forms = Form.query.filter_by(template_id=1, farm_name=farm_name, barn_number=barn_number, cycle_number=cycle_number).all()
+    # print(forms)
+    for form in forms:
+        template_id = form.template_id
+        template_rows = TemplateRow.query.filter_by(template_id=template_id).all()
+        form_columns = FormColumns.query.filter_by(form_id=form.form_id).all()
+        # print(template_rows)
+        for form_column in form_columns:
+            for template_row in template_rows:
+
+                row = TemplateRow.query.filter_by(template_id=form.template_id,
+                                                  row_title=template_row.row_title).first()
+                from Report_Manager.SubmitDataModel import get_submitted_data
+                data = get_submitted_data(template_id=template_row.template_id,
+                                          row_title=form_column.column_title, form_id=form.form_id,
+                                          column_title=row.row_title)
+                if data is not None:
+                    form_data[template_row.row_title] = data
+            forms_data.append(form_data)
+            form_data = {}
+    # print(forms_data)
+    return forms_data
