@@ -1,7 +1,7 @@
 import datetime
 
 from flask import jsonify, render_template, request, url_for, redirect
-from model import app, Farm, Form, TemplateRow, FormColumns
+from model import app, Farm, Form, TemplateRow, FormColumns, Template, Metadata
 
 
 # def get_hour(time_string):
@@ -56,6 +56,7 @@ def view_labor_pre_form():
 
 @app.route('/supervisor_pre_form', methods=['GET', 'POST'])
 def view_supervisor_pre_form():
+    # add the measurement of the data
     if request.method == 'POST':
         farm_name = request.form.get("farm_name")
         print(farm_name)
@@ -163,6 +164,30 @@ def get_forms_data():
         print(result)
         return str(result)
     return render_template("search_for_data.html")
+
+
+@app.route('/delivery_note_pre_form', methods=['GET', 'POST'])
+def view_delivery_note_pre_form():
+    if request.method == 'POST':
+        farm_name = request.form.get("farm_name")
+        cycle_number = request.form.get("cycle_number")
+        print("11", farm_name)
+        return redirect(
+            url_for('view_delivery_note_form',farm_name=farm_name, cycle_number=cycle_number))
+    from Report_Manager.FormModel import get_all_farms
+    farms = get_all_farms()
+    return render_template('delivery_note_pre_form.html', farms=farms)
+
+
+@app.route('/form/delivery_note', methods=['GET', 'POST'])
+def view_delivery_note_form():
+    farm_name = request.args.get('farm_name')
+    cycle_number = request.args.get('cycle_number')
+    print(farm_name)
+    print(cycle_number)
+    from Report_Manager.Reporting_services import build_delivery_note_form
+    return build_delivery_note_form(farmName=farm_name,
+                                    cycle_number=cycle_number)
 
 
 @app.route('/')
