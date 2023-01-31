@@ -71,8 +71,9 @@ def get_form(form_type: str, cycle_number, columns):
     for column in form_columns:
         new_form_column = FormColumns(form_id=form.form_id, column_title=column)
         new_form_column.save()
+    from templates.translator import translate_to_arabic, translate_to_english
     return render_template('form_builder.html', form_id=form.form_id, column_names=form_columns,
-                           row_names=template_rows, rows_data=rows_data)
+                           row_names=template_rows, rows_data=rows_data, translate_to_arabic=translate_to_arabic, translate_to_english=translate_to_english)
 
 
 def get_labor_form(form_type, farm_name, barn_number, cycle_number, columns):

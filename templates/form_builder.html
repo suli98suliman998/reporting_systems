@@ -1,9 +1,11 @@
 {% extends "base.html" %}
 {% block content %}
-<div class="container">
+<button id="switch-language-btn" style="float:right; background-color:lightgreen;">Arabic</button>
+
+<div class="container" style="text-align:center;">
     <form action="/submit_form/{{ form_id }}" method="post" onsubmit="return submitForm()">
     <input type="hidden" name="form_id" value="{{ form_id }}">
-        <table>
+        <table class="table table-striped">
             <thead>
                 <tr>
                     <th>Row Name</th>
@@ -15,7 +17,7 @@
             <tbody>
                 {% for row in row_names %}
                     <tr>
-                        <td>{{ row }}</td>
+                        <td id="{{ row }}-row-name">{{ row }}</td>
                             {% for column in column_names %}
                                 <td><input type="text" name="{{ row }}-{{ column }}"></td>
                             {% endfor %}
@@ -23,15 +25,44 @@
                     </tr>
                 {% endfor %}
             </tbody>
-
         </table>
-    <input type="submit" value="Submit">
+    <input type="submit" value="Submit" style="background-color:lightgreen;">
     </form>
     <script>
+        const switchLanguageBtn = document.getElementById("switch-language-btn");
+        switchLanguageBtn.addEventListener("click", function() {
+            const rowNames = {{ row_names | tojson }};
+            const arabicRowNames = [];
+            // Translate the row names from English to Arabic and update the text content of the corresponding td elements
+            rowNames.forEach(function(rowName, index) {
+                arabicRowNames[index] = translateToArabic(rowName);
+                document.getElementById(`${rowName}-row-name`).textContent = arabicRowNames[index];
+            });
+        });
         function submitForm() {
             // Add form validation or any other logic here
             return true;
         }
+        function translateToArabic(text) {
+        const dictionary = {
+        "AVG Weight": "متوسط الوزن",
+        "Mortality": "النافق",
+        "Age": "العمر",
+        "Consumed Feed": "العلف المستهلك",
+        "Consumed Water": "الماء المستهلك",
+        "Feed Storage": "مخزون العلف",
+        "Light Time": "عدد ساعات الإضائة",
+        "Temperature": "درجة الحرارة",
+        "Vaccines Used": "اللقاحات المستخدمة",
+        "Vaccines Used Count": "عدد اللقاحات المستخدمة",
+        "Medicine Used": "الأدوية المستخدمة",
+        "Medicine Used Count": "عدد الأدوية المستخدمة",
+        "PH Level": "درجة ملوحة الماء"
+            };
+
+        return dictionary[text] || text;
+        }
+</script>
     </script>
 </div>
 {% endblock %}
