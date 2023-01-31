@@ -1,8 +1,7 @@
-
 {% extends "base.html" %}
 {% block content %}
     <div class="container">
-        <form action="/supervisor_pre_form" method="post">
+        <form action="/get_forms_data" method="post">
         <div class="form-group">
             <label for="farm_name"><span class="text-danger">*</span>Farm Name:</label>
             <select name="farm_name" class="form-control" id="farm_select" required>
@@ -15,10 +14,24 @@
             <label for="cycle_number"><span class="text-danger">*</span>Cylce Number:</label>
             <input type="text" class="form-control" name="cycle_number" required><br>
         </div>
-        <label for="barn_number"><span class="text-danger">*</span>House Number:</label>
+        <div class="form-group">
+            <label for="barn_number"><span class="text-danger">*</span>House Number:</label>
             <select name="barn_number" class="form-control" required>
             </select><br>
-        <button type="submit" class="btn btn-default">Next</button>
+         </div>
+        <div class="form-group">
+        <label for="template_type"><span class="text-danger">*</span>Form Type:</label>
+            <select name="template_type" class="form-control" required>
+                <option value="Daily_Barn">Daily Barn</option>
+                <option value="Daily_Farm_Supervisor">Daily Farm Supervisor</option>
+                <option value="Daily_Farm_Tech">Daily Farm Tech</option>
+                <option value="Daily_Farm">Daily Farm</option>
+                <option value="Daily_OP">Daily OP</option>
+                <option value="Daily_Management">Daily Management</option>
+            </select>
+            <div class="msg">{{ msg }}</div>
+        </div>
+        <button type="submit" class="btn btn-default">Get Data</button>
         </form>
     <script>
     // Get the farm select element

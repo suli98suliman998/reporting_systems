@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Form ID</th>
+                <th>Farm Name</th>
+                <th>Barn Number</th>
+                <th>Date</th>
+                <th>Time</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for form in forms %}
+            <tr>
+                <td>{{ form.form_id }}</td>
+              <td>{{ form.farm_name }}</td>
+              <td>{{ form.barn_number }}</td>
+              {% set date, time = get_date_time(form.metadata_id) %}
+              <td>{{ date }}</td>
+              <td>{{ time }}</td>
+                <td><button class="btn btn-success" onclick="window.location.href='/view_form_id/{{ form.form_id }}'">View</button></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

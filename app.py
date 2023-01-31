@@ -1,7 +1,5 @@
-import datetime
-
 from flask import jsonify, render_template, request, url_for, redirect
-from model import app, Farm, Form, TemplateRow, FormColumns, Template, Metadata
+from model import app, Farm, Metadata, SubmittedData
 
 
 # def get_hour(time_string):
@@ -149,8 +147,54 @@ def success():
     return redirect(url_for('home'))
 
 
+@app.route('/delivery_note_pre_form', methods=['GET', 'POST'])
+def view_delivery_note_pre_form():
+    if request.method == 'POST':
+        farm_name = request.form.get("farm_name")
+        cycle_number = request.form.get("cycle_number")
+        print("11", farm_name)
+        return redirect(
+            url_for('view_delivery_note_form', farm_name=farm_name, cycle_number=cycle_number))
+    from Report_Manager.FormModel import get_all_farms
+    farms = get_all_farms()
+    return render_template('delivery_note_pre_form.html', farms=farms)
+
+
+@app.route('/form/delivery_note', methods=['GET', 'POST'])
+def view_delivery_note_form():
+    farm_name = request.args.get('farm_name')
+    cycle_number = request.args.get('cycle_number')
+    print(farm_name)
+    print(cycle_number)
+    from Report_Manager.Reporting_services import build_delivery_note_form
+    return build_delivery_note_form(farmName=farm_name,
+                                    cycle_number=cycle_number)
+
+
+@app.route('/view_data', methods=['GET', 'POST'])
+def view_data():
+    farm_name = request.form.get('farm_name')
+    cycle_number = request.form.get('cycle_number')
+    barn_number = request.form.get("barn_number")
+    data_choice = request.form.get("data")
+    print(farm_name)
+    from Report_Manager.Reporting_services import get_data
+    data = get_data(farm_name=farm_name, barn_number=barn_number, cycle_number=cycle_number)
+    from Buisness_Logic.calculate_totals import get_total_of_specefic_row
+    ttl = get_total_of_specefic_row(data, data_choice)
+    msg = str(str(data_choice) + " is " + str(ttl))
+    print(msg)
+    from Report_Manager.FormModel import get_all_farms
+    farms = get_all_farms()
+    return render_template('review_data.html', farmName=farm_name,
+                           cycle_number=cycle_number,
+                           barn_number=barn_number,
+                           data=data_choice,
+                           farms=farms, msg=msg)
+
+
 @app.route('/get_data', methods=['GET', 'POST'])
-def get_forms_data():
+def get_form_data():
     if request.method == 'POST':
         farm_name = request.form.get('farm_name')
         barn_number = request.form.get('barn_number')
@@ -166,28 +210,27 @@ def get_forms_data():
     return render_template("search_for_data.html")
 
 
-@app.route('/delivery_note_pre_form', methods=['GET', 'POST'])
-def view_delivery_note_pre_form():
+@app.route('/get_forms_data', methods=['GET', 'POST'])
+def get_forms_data():
     if request.method == 'POST':
-        farm_name = request.form.get("farm_name")
-        cycle_number = request.form.get("cycle_number")
-        print("11", farm_name)
-        return redirect(
-            url_for('view_delivery_note_form',farm_name=farm_name, cycle_number=cycle_number))
+        farm_name = request.form.get('farm_name')
+        barn_number = request.form.get('barn_number')
+        cycle_number = request.form.get('cycle_number')
+        template_type = request.form.get('template_type')
+        from Report_Manager.Reporting_services import get_forms_of_type
+        forms = get_forms_of_type(farm_name=farm_name, barn_number=barn_number, cycle_number=cycle_number,
+                                  template_type=template_type)
+        from Report_Manager.Reporting_services import get_date_time
+        return render_template('table_of_forms.html', forms=forms, get_date_time=get_date_time)
     from Report_Manager.FormModel import get_all_farms
     farms = get_all_farms()
-    return render_template('delivery_note_pre_form.html', farms=farms)
+    return render_template("get_forms.html", farms=farms)
 
 
-@app.route('/form/delivery_note', methods=['GET', 'POST'])
-def view_delivery_note_form():
-    farm_name = request.args.get('farm_name')
-    cycle_number = request.args.get('cycle_number')
-    print(farm_name)
-    print(cycle_number)
-    from Report_Manager.Reporting_services import build_delivery_note_form
-    return build_delivery_note_form(farmName=farm_name,
-                                    cycle_number=cycle_number)
+@app.route('/view_form_id/<form_id>', methods=['GET'])
+def view_form_id(form_id):
+    submitted_data = SubmittedData.query.filter_by(form_id=form_id).all()
+    return render_template("view_form_id.html", submitted_data=submitted_data)
 
 
 @app.route('/')

@@ -1,7 +1,4 @@
-from flask import render_template
-
-from Report_Manager.TemplateModel import get_row_titles_by_template_id
-from model import FormColumns, db, Form, form_schema, Farm
+from model import FormColumns, db, Form, Farm, Template
 
 
 def get_form_columns_by_form_id(form_id):
@@ -28,3 +25,6 @@ def get_form_by_id(form_id: int):
 def get_forms_by_cycle_number(cycle_number, farm_name, barn_number):
     forms = Form.query.filter_by(cycle_number=cycle_number, farm_name=farm_name, barn_number=barn_number).all
     return forms
+
+
+

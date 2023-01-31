@@ -36,7 +36,7 @@ def build_delivery_note_form(farmName, cycle_number):
 
 
 def get_form(form_type: str, cycle_number, columns):
-    from Buisness_Logic.calculate_totals import get_total_of_specefic_row
+    # from Buisness_Logic.calculate_totals import get_total_of_specefic_row
     template_id = TemplateModel.get_template_id_by_type(form_type)
     template_rows = get_row_titles_by_template_id(template_id)
     user = get_user_info(1)  # later using session
@@ -47,15 +47,20 @@ def get_form(form_type: str, cycle_number, columns):
     time = int(datetime.datetime.now().time().hour.numerator)
     title = form_type
     rows_data = {}
-    data = get_data(farm_name=farmName, barn_number=barnNumber, cycle_number=cycle_number)
-    for i in template_rows:
-        for k in data:
-            if k.get(i) is None:
-                continue
-            else:
-                sum = get_total_of_specefic_row(data, i)
-                rows_data[i] = sum
-            break
+    # data = get_data(farm_name=farmName, barn_number=barnNumber, cycle_number=cycle_number)
+    # for i in template_rows:
+    #     if data:
+    #         for k in data:
+    #             if k.get(i) is None:
+    #                 continue
+    #             else:
+    #                 # if i in ["Mortality", "Age", "Consumed Feed", "Arrived Mortalities", "First Week Mortalities",
+    #                 #          "Temperature", "Total Mortalities"]:
+    #                 sum = get_total_of_specefic_row(data, i)  # To be edited late
+    #                 rows_data[i] = sum
+    #                 # else:
+    #                 #     pass
+    #             break
     metadata = Metadata(date=date, time=time, title=title)
     metadata.save()
     form = Form(template_id=template_id, filled_by=filled_by, farm_name=farmName, barn_number=barnNumber,
@@ -109,14 +114,12 @@ def submit_form(form_id):
                 data = form_data[column] = request.form.get(column + "-" + row)
                 submitted_data = SubmittedData(template_id=template_id, column_title=column, form_id=form.form_id,
                                                row_title=row, data=data)
-                # print(form_data.popitem()[0])  # prints AVG Weight and [1] prints its value *******************
                 db.session.add(submitted_data)
                 db.session.commit()
         return redirect("/success")
 
 
 def get_total_mortality(cycle_number, farm_name, barn_number):
-    # Query the forms table for forms with the specified cycle number, farm name, and barn number
     forms = Form.query.filter_by(cycle_number=cycle_number, farm_name=farm_name, barn_number=barn_number).all()
     total_mortality = 0
     for form in forms:
@@ -128,7 +131,6 @@ def get_shift():
     current_time = datetime.datetime.now().time()
     shifts = ['3:00 -> 6:00', '6:00 -> 9:00', '9:00 -> 12:00', '12:00 -> 15:00', '15:00 -> 18:00', '18:00 -> 21:00',
               '21:00 -> 24:00', '24:00 -> 3:00']
-
     if datetime.time(3, 0) <= current_time < datetime.time(6, 0):
         shift = shifts[0]
     elif datetime.time(6, 0) <= current_time < datetime.time(9, 0):
@@ -145,8 +147,6 @@ def get_shift():
         shift = shifts[6]
     else:
         shift = shifts[7]
-
-    print(shift)
     return shift
 
 
@@ -184,8 +184,24 @@ def get_data(farm_name, barn_number, cycle_number):
                             form_data[form_row.row_title] = data
                 forms_data.append(form_data)
                 form_data = {}
+
     else:
         return None
+    from Buisness_Logic.calculate_totals import set_max_age
+    forms_data = set_max_age(forms_data)
     return forms_data
 
 
+def get_forms_of_type(farm_name, barn_number, cycle_number, template_type):
+    template = Template.query.filter_by(type=template_type).first()
+    template_id = template.template_id
+    forms = Form.query.filter_by(template_id=template_id, cycle_number=cycle_number, farm_name=farm_name,
+                                 barn_number=barn_number).all()
+    return forms
+
+
+def get_date_time(metadata_id):
+    metadata = Metadata.query.filter_by(metadata_id=metadata_id).first()
+    date = metadata.date
+    time = metadata.time
+    return date, time

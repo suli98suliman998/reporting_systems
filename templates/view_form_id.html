@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Column Title</th>
+                <th>Row Title</th>
+                <th>Data</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for data in submitted_data %}
+            <tr>
+                <td>{{ data.row_title }}</td>
+                <td>{{ data.column_title }}</td>
+                <td>{{ data.data }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
