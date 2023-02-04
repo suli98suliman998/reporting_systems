@@ -171,9 +171,11 @@ def get_data(farm_name, barn_number, cycle_number):
         for form in forms:
             template_id = form.template_id
             form_rows = TemplateRow.query.filter_by(template_id=template_id).all()
+
             form_columns = FormColumns.query.filter_by(form_id=form.form_id).all()
             for form_column in form_columns:
                 for form_row in form_rows:
+                    print(form_row)
                     data = get_submitted_data(template_id=form.template_id,
                                               row_title=form_column.column_title,
                                               form_id=form.form_id,
@@ -198,6 +200,7 @@ def get_forms_of_type(farm_name, barn_number, cycle_number, template_type):
     template_id = template.template_id
     forms = Form.query.filter_by(template_id=template_id, cycle_number=cycle_number, farm_name=farm_name,
                                  barn_number=barn_number).all()
+    forms = [forms, template_id]
     return forms
 
 

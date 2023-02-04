@@ -1,5 +1,5 @@
 from flask import jsonify, render_template, request, url_for, redirect
-from model import app, Farm, Metadata, SubmittedData
+from model import app, Farm, Metadata, SubmittedData, db
 
 
 # def get_hour(time_string):
@@ -221,16 +221,24 @@ def get_forms_data():
         forms = get_forms_of_type(farm_name=farm_name, barn_number=barn_number, cycle_number=cycle_number,
                                   template_type=template_type)
         from Report_Manager.Reporting_services import get_date_time
-        return render_template('table_of_forms.html', forms=forms, get_date_time=get_date_time)
+        return render_template('table_of_forms.html', forms=forms[0], get_date_time=get_date_time, template_type=template_type)
     from Report_Manager.FormModel import get_all_farms
     farms = get_all_farms()
     return render_template("get_forms.html", farms=farms)
 
 
-@app.route('/view_form_id/<form_id>', methods=['GET'])
+@app.route('/view_form_id/<form_id>', methods=['GET', 'POST'])
 def view_form_id(form_id):
+    if request.method == 'POST':
+        submitted_data = SubmittedData.query.filter_by(form_id=form_id).first()
+        new_value = request.form.get(f"{submitted_data.template_id}_{submitted_data.row_title}_{submitted_data.form_id}_{submitted_data.column_title}")
+        if new_value:
+            submitted_data.data = new_value
+            db.session.commit()
+        return redirect(url_for('view_form_id', form_id=submitted_data.form_id))
     submitted_data = SubmittedData.query.filter_by(form_id=form_id).all()
-    return render_template("view_form_id.html", submitted_data=submitted_data)
+    template_type = request.args.get("template_type")
+    return render_template("view_form_id.html", submitted_data=submitted_data, template_type=template_type, form_id=form_id)
 
 
 @app.route('/')

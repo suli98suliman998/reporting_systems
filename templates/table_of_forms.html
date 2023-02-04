@@ -22,7 +22,7 @@
               {% set date, time = get_date_time(form.metadata_id) %}
               <td>{{ date }}</td>
               <td>{{ time }}</td>
-                <td><button class="btn btn-success" onclick="window.location.href='/view_form_id/{{ form.form_id }}'">View</button></td>
+                <td><button class="btn btn-success" onclick="window.location.href='/view_form_id/{{ form.form_id }}?template_type={{ template_type }}'">View</button></td>
             </tr>
             {% endfor %}
         </tbody>

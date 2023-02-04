@@ -1,24 +1,30 @@
+
 {% extends "base.html" %}
 {% block content %}
 
 <div class="container">
-    <table class="table table-striped">
-        <thead>
-            <tr>
-                <th>Column Title</th>
-                <th>Row Title</th>
-                <th>Data</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for data in submitted_data %}
-            <tr>
-                <td>{{ data.row_title }}</td>
-                <td>{{ data.column_title }}</td>
-                <td>{{ data.data }}</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <form action="{{ url_for('view_form_id', form_id=form_id) }}" method="post">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Column Title</th>
+                    <th>Row Title</th>
+                    <th>Data</th>
+                    <th>Override "Optional"</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for data in submitted_data %}
+                <tr>
+                    <td>{{ data.row_title }}</td>
+                    <td>{{ data.column_title }}</td>
+                    <td>{{ data.data }}</td>
+                    <td><input type="text" name="{{ data.template_id }}_{{ data.row_title }}_{{ data.form_id }}_{{ data.column_title }}" value=""></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <input type="submit" value="Submit Changes">
+    </form>
 </div>
 {% endblock %}

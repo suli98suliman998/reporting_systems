@@ -11,6 +11,7 @@
 #         return None
 #     return total
 def get_total_of_specefic_row(data, needed_data):
+    print("tttl", data, needed_data)
     total = 0
     last_entered_value = None
     total_mortality = float()
