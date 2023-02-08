@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Type ID</th>
+                <th>Type Name</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for type in types %}
+            <tr>
+                <td>{{ type.id }}</td>
+                <td>{{ type.type }}</td>
+                <td>
+                    <button class="btn btn-success" onclick="window.location.href='/suppliers_table/{{ type.id }}'">View Suppliers</button>
+                    <i class="fas fa-pen-square"></i>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

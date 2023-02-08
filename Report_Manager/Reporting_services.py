@@ -31,8 +31,11 @@ def build_delivery_note_form(farmName, cycle_number):
     new_form_column = FormColumns(form_id=form.form_id, column_title=str(column))
     new_form_column.save()
     print(farmName)
-    return render_template('delivery_note.html', farm_name=farmName,
-                           row_names=template_rows)
+    from categories.categoriesModel import get_categories
+    categories = get_categories()
+    print(categories)
+    return render_template('delivery_note.html', farm_name=farmName, row_names=template_rows, categories=categories)
+
 
 
 def get_form(form_type: str, cycle_number, columns):

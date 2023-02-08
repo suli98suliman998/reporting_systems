@@ -117,7 +117,6 @@ def view_op_pre_form():
 
 @app.route('/farm_pre_form', methods=['GET', 'POST'])
 def view_farm_pre_form():
-
     if request.method == 'POST':
         farm_name = request.form.get("farm_name")
         cycle_number = request.form.get("cycle_number")
@@ -184,6 +183,23 @@ def view_delivery_note_form():
     from Report_Manager.Reporting_services import build_delivery_note_form
     return build_delivery_note_form(farmName=farm_name,
                                     cycle_number=cycle_number)
+
+
+@app.route('/get_types_by_category_id/<category_id>', methods=['GET', 'POST'])
+def get_types(category_id):
+    from categories.categoriesModel import get_types_by_category_id
+    types = get_types_by_category_id(category_id)
+    types_dict = [dict(id=type.id, type=type.type) for type in types]
+    return jsonify(types_dict)
+
+@app.route('/get_suppliers_by_type_id/<type_id>', methods=['GET', 'POST'])
+def get_suppliers(type_id):
+    from categories.categoriesModel import get_suppliers_by_type_id
+    suppliers = get_suppliers_by_type_id(type_id)
+    types_dict = [dict(id=supplier.id, supplier_name=supplier.supplier_name) for supplier in suppliers]
+    return jsonify(types_dict)
+
+
 
 
 @app.route('/view_data', methods=['GET', 'POST'])
@@ -292,6 +308,51 @@ def view_login():
     print(11)
     from User.UserController import controller_login
     return controller_login()
+
+
+@app.route('/categories', methods=['GET', 'POST'])
+def view_categories():
+    if request.method == 'POST':
+        category_id = request.form.get('category_id')
+        if category_id:
+            # perform action for modifying the category
+            pass
+    from categories.categoriesModel import get_categories
+    categories = get_categories()
+    return render_template("categories_table.html", categories=categories)
+
+
+@app.route('/types_table/<category_id>', methods=['GET', 'POST'])
+def view_types(category_id):
+    print(11)
+    if request.method == 'POST':
+        print(22)
+        type_id = request.form.get('type_id')
+        if type_id:
+            # perform action for modifying the type
+            pass
+    from categories.categoriesModel import get_types_by_category_id
+    types = get_types_by_category_id(category_id)
+    return render_template("types_table.html", types=types, category_id=category_id)
+
+
+@app.route('/suppliers_table/<type_id>', methods=['GET', 'POST'])
+def view_suppliers(type_id):
+    if request.method == 'POST':
+        supplier_id = request.form.get('supplier_id')
+        if supplier_id:
+            # perform action for modifying the supplier
+            pass
+    from categories.categoriesModel import get_suppliers_by_type_id
+    suppliers = get_suppliers_by_type_id(type_id)
+    return render_template("suppliers_table.html", suppliers=suppliers, type_id=type_id)
+
+
+@app.route('/modify_row/<row_id>', methods=['GET', 'POST'])
+def modify_row(row_id):
+    # perform the action for modifying the specific row
+    print("modify")
+    pass
 
 
 if __name__ == '__main__':

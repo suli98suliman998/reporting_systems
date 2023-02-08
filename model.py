@@ -256,5 +256,68 @@ class FarmSchema(SQLAlchemyAutoSchema):
 famr_schema = FarmSchema()
 farms_schema = FarmSchema(many=True)
 
+
+class Category(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    category_name = db.Column(db.String(120), nullable=False)
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
+
+class CategorySchema(SQLAlchemyAutoSchema):
+    class Meta:
+        model = Category
+        include_relationships = True
+        load_instance = True
+
+
+category_schema = CategorySchema()
+categories_schema = CategorySchema(many=True)
+
+
+class Type(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    type = db.Column(db.String(120), nullable=False)
+    category_id = db.Column(db.Integer, db.ForeignKey('category.id'), nullable=False)
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
+
+class TypeSchema(SQLAlchemyAutoSchema):
+    class Meta:
+        model = Type
+        include_relationships = True
+        load_instance = True
+
+
+type_schema = TypeSchema()
+types_schema = TypeSchema(many=True)
+
+
+class Supplier(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    supplier_name = db.Column(db.String(120), nullable=False)
+    unit_price = db.Column(db.Float, nullable=False)
+    type_id = db.Column(db.Integer, db.ForeignKey('type.id'), nullable=False)
+
+    def save(self):
+        db.session.add(self)
+        db.session.commit()
+
+
+class SupplierSchema(SQLAlchemyAutoSchema):
+    class Meta:
+        model = Supplier
+        include_relationships = True
+        load_instance = True
+
+
+Supplier_schema = SupplierSchema()
+Suppliers_schema = SupplierSchema(many=True)
+
 with app.app_context():
     db.create_all()
