@@ -27,3 +27,25 @@ def get_user_info(user_id):
         labor_info = labor_schema.dump(labor)
         user_info.update(labor_info)
     return user_info
+
+
+def get_user_id_by_username(username):
+    user = Users.query.filter_by(username=username).first()
+    user_id = user.user_id
+    if not user:
+        return None
+    user_info = user_schema.dump(user)
+    if user.jobTitle == 'Labor':
+        labor = Labor.query.filter_by(user_id=user_id).first()
+        labor_info = labor_schema.dump(labor)
+        user_info.update(labor_info)
+    return user_info
+
+
+def db_login(username, password):
+    print(44)
+    user = Users.query.filter_by(username=username).first()
+    if user and user.password == password:
+        print(user)
+        return user
+    return None

@@ -8,6 +8,7 @@ from sqlalchemy import Column, Integer, ForeignKey, String, PrimaryKeyConstraint
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 app = Flask(__name__)
+app.secret_key = 'IM_THE_BEST'
 app.config['SQLALCHEMY_DATABASE_URI'] = \
     'sqlite:///' + os.path.join(basedir, 'database.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
@@ -20,6 +21,7 @@ class Users(db.Model):
     user_id = Column(Integer, primary_key=True)
     name = Column(String)
     username = Column(String)
+    password = Column(String)
     jobTitle = Column(String)
 
     def save(self):
@@ -96,6 +98,8 @@ class FormColumns(db.Model):
     def save(self):
         db.session.add(self)
         db.session.commit()
+
+
 class FormColumnsSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = FormColumns

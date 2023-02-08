@@ -1,5 +1,7 @@
 from flask import jsonify, render_template, request, url_for, redirect
-from model import app, Farm, Metadata, SubmittedData, db
+
+from functions import check_session
+from model import app, Farm, SubmittedData, db
 
 
 # def get_hour(time_string):
@@ -40,6 +42,9 @@ def generate_qr():
 
 @app.route('/labor_pre_form', methods=['GET', 'POST'])
 def view_labor_pre_form():
+    if check_session('Labor') == "Access Denied":
+        return "Access Denied, You are not authorized to access this page"  # make a nice page view for it
+
     from Report_Manager.Reporting_services import get_shift
     shift = get_shift()
     if request.method == 'POST':
@@ -54,6 +59,9 @@ def view_labor_pre_form():
 
 @app.route('/supervisor_pre_form', methods=['GET', 'POST'])
 def view_supervisor_pre_form():
+    if check_session('Farm Supervisor') == "Access Denied":
+        return "Access Denied, You are not authorized to access this page"  # make a nice page view for it
+
     # add the measurement of the data
     if request.method == 'POST':
         farm_name = request.form.get("farm_name")
@@ -71,6 +79,9 @@ def view_supervisor_pre_form():
 
 @app.route('/tech_pre_form', methods=['GET', 'POST'])
 def view_tech_pre_form():
+    if check_session('Farm Eng') == "Access Denied":
+        return "Access Denied, You are not authorized to access this page"  # make a nice page view for it
+
     if request.method == 'POST':
         farm_name = request.form.get("farm_name")
         print(farm_name)
@@ -87,6 +98,9 @@ def view_tech_pre_form():
 
 @app.route('/op_pre_form', methods=['GET', 'POST'])
 def view_op_pre_form():
+    if check_session('Operation Manager') == "Access Denied":
+        return "Access Denied, You are not authorized to access this page"  # make a nice page view for it
+
     if request.method == 'POST':
         farm_name = request.form.get("farm_name")
         print(farm_name)
@@ -103,6 +117,7 @@ def view_op_pre_form():
 
 @app.route('/farm_pre_form', methods=['GET', 'POST'])
 def view_farm_pre_form():
+
     if request.method == 'POST':
         farm_name = request.form.get("farm_name")
         cycle_number = request.form.get("cycle_number")
@@ -144,7 +159,7 @@ def submit_form_data(form_id):
 
 @app.route('/success')
 def success():
-    return redirect(url_for('home'))
+    return redirect(url_for('dashboard'))
 
 
 @app.route('/delivery_note_pre_form', methods=['GET', 'POST'])
@@ -221,7 +236,8 @@ def get_forms_data():
         forms = get_forms_of_type(farm_name=farm_name, barn_number=barn_number, cycle_number=cycle_number,
                                   template_type=template_type)
         from Report_Manager.Reporting_services import get_date_time
-        return render_template('table_of_forms.html', forms=forms[0], get_date_time=get_date_time, template_type=template_type)
+        return render_template('table_of_forms.html', forms=forms[0], get_date_time=get_date_time,
+                               template_type=template_type)
     from Report_Manager.FormModel import get_all_farms
     farms = get_all_farms()
     return render_template("get_forms.html", farms=farms)
@@ -231,19 +247,32 @@ def get_forms_data():
 def view_form_id(form_id):
     if request.method == 'POST':
         submitted_data = SubmittedData.query.filter_by(form_id=form_id).first()
-        new_value = request.form.get(f"{submitted_data.template_id}_{submitted_data.row_title}_{submitted_data.form_id}_{submitted_data.column_title}")
+        new_value = request.form.get(
+            f"{submitted_data.template_id}_{submitted_data.row_title}_{submitted_data.form_id}_{submitted_data.column_title}")
         if new_value:
             submitted_data.data = new_value
             db.session.commit()
         return redirect(url_for('view_form_id', form_id=submitted_data.form_id))
     submitted_data = SubmittedData.query.filter_by(form_id=form_id).all()
     template_type = request.args.get("template_type")
-    return render_template("view_form_id.html", submitted_data=submitted_data, template_type=template_type, form_id=form_id)
+    return render_template("view_form_id.html", submitted_data=submitted_data, template_type=template_type,
+                           form_id=form_id)
+
+
+@app.route('/dashboard')
+def dashboard():
+    return render_template('index.html')
+
+
+@app.route('/labor_dashboard')
+def labor_dashboard():
+    return render_template('labor_index.html')
 
 
 @app.route('/')
-def home():
-    return render_template('index.html')
+def pp():
+    print("oopp")
+    return render_template('login.html')
 
 
 @app.route('/register_user', methods=['GET', 'POST'])
@@ -256,6 +285,13 @@ def view_user_registration():
 def view_labor_registration():
     from User.UserController import controller_create_labor
     return controller_create_labor()
+
+
+@app.route('/login', methods=['GET', 'POST'])
+def view_login():
+    print(11)
+    from User.UserController import controller_login
+    return controller_login()
 
 
 if __name__ == '__main__':
