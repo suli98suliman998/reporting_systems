@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
+
 <div class="container">
     <form action="/submit_form/{{ form_id }}" method="post" onsubmit="return submitForm()">
     <input type="hidden" name="farm_name" value="{{ form_id }}">
@@ -14,8 +15,28 @@
                 {% for row in row_names %}
                     <tr>
                         <td>{{ row }}</td>
-                        {% if row == "Image" %}
-                            <td><input type="file" accept="image/*" name="{{ row }}-{{ column_names }}"></td>
+                        {% if row == "Category" %}
+                            <td>
+                                <select name="{{ row }}-{{ column_names }}">
+                                    <option value="chicks">Chicks</option>
+                                    <option value="feed">Feed</option>
+                                    <option value="water">Water</option>
+                                    <option value="diesel">Diesel</option>
+                                    <option value="medicine">Medicine</option>
+                                    <option value="vaccine">Vaccine</option>
+                                    <option value="cleaning supplies">Cleaning Supplies</option>
+                                    <option value="lime">Lime</option>
+                                    <option value="sawdust">Sawdust</option>
+                                </select>
+                            </td>
+                        {% elif row == "Type" %}
+                            <td>
+                                <select name="{{ row }}-{{ column_names }}" id="Type">
+                                    <option value="starter">Starter</option>
+                                    <option value="grower">Grower</option>
+                                    <option value="finisher">Finisher</option>
+                                </select>
+                            </td>
                         {% else %}
                             <td><input type="text" name="{{ row }}-{{ column_names }}"></td>
                         {% endif %}
@@ -26,6 +47,16 @@
     <input type="submit" value="Submit">
     </form>
     <script>
+        var category = document.getElementsByName("Category-{{ column_names }}")[0];
+        var type = document.getElementById("Type");
+        category.addEventListener("change", function() {
+            if (category.value === "feed") {
+                type.style.display = "inline-block";
+            } else {
+                type.style.display = "none";
+                type.value = "";
+            }
+        });
         function submitForm() {
             // Add form validation or any other logic here
             return true;
