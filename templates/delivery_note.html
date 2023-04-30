@@ -1,86 +1,159 @@
-
-
+{#{% extends "base.html" %}#}
+{#{% block content %}#}
+{##}
+{##}
+{##}
+{#<div class="container" style="text-align:center;">#}
+{#    <form action="/submit_form/{{ form_id }}" method="post" onsubmit="return submitForm()">#}
+{#    <input type="hidden" name="form_id" value="{{ form_id }}">#}
+{#        <table class="table table-striped">#}
+{#            <thead>#}
+{#                <tr>#}
+{#                    <th>Farm Name:&nbsp&nbsp</th>#}
+{#                    <th>{{ farm_name }}</th>#}
+{#                </tr>#}
+{#            </thead>#}
+{#            <tbody>#}
+{#            <tr><td>{{ form_id }}</td></tr>#}
+{#                {% for row in row_names %}#}
+{#                    <tr>#}
+{#                        <td>{{ row }}</td>#}
+{#                        {% if row == "Category" %}#}
+{#                            <td>#}
+{#                                <select id="categorySelect" onchange="updateSuppliers()">#}
+{#                                    {% for category in categories %}#}
+{#                                      <option value="{{ category.category_name }}">{{ column_names[0] }}</option>#}
+{#                                    {% endfor %}#}
+{#                                </select>#}
+{#                            </td>#}
+{#                        {% elif row == "Type" %}#}
+{#                            <td>#}
+{#                                <select id="typeSelect" onchange="updateSuppliers()">#}
+{#                                </select>#}
+{#                            </td>#}
+{#                        {% elif row == "Supplier" %}#}
+{#                            <td>#}
+{#                                <select id="supplierSelect">#}
+{#                                </select>#}
+{#                            </td>#}
+{#                        {% else %}#}
+{#                            <td><input type="text" name="{{ row }}-{{ column_names[0] }}"></td>#}
+{#                        {% endif %}#}
+{#                    </tr>#}
+{#                {% endfor %}#}
+{##}
+{#            </tbody>#}
+{#        </table>#}
+{#    <input type="submit" value="Submit" style="background-color:lightgreen;">#}
+{#    </form>#}
+{#<script>#}
+{#    function submitForm() {#}
+{#            // Add form validation or any other logic here#}
+{#            return true;#}
+{#        }#}
+{#    function updateSuppliers() {#}
+{#        var categorySelect = document.getElementById("categorySelect");#}
+{#        var categoryId = categorySelect.value;#}
+{#        var typeSelect = document.getElementById("typeSelect");#}
+{#        var xhr = new XMLHttpRequest();#}
+{#        xhr.open("GET", "/get_types_by_category_id/" + categoryId, true);#}
+{#        xhr.onreadystatechange = function() {#}
+{#          if (xhr.readyState === 4 && xhr.status === 200) {#}
+{#            var types = JSON.parse(xhr.responseText);#}
+{#            typeSelect.innerHTML = "";#}
+{#            for (var i = 0; i < types.length; i++) {#}
+{#              typeSelect.innerHTML += "<option value='" + types[i].id + "'>" + types[i].type + "</option>";#}
+{#            }#}
+{#          }#}
+{#        };#}
+{#        xhr.send();#}
+{##}
+{#        var supplierSelect = document.getElementById("supplierSelect");#}
+{#        var typeId = typeSelect.value;#}
+{#        var xhr2 = new XMLHttpRequest();#}
+{#        xhr2.open("GET", "/get_suppliers_by_type_id/" + typeId, true);#}
+{#        xhr2.onreadystatechange = function() {#}
+{#          if (xhr2.readyState === 4 && xhr2.status === 200) {#}
+{#            var suppliers = JSON.parse(xhr2.responseText);#}
+{#            supplierSelect.innerHTML = "";#}
+{#            for (var i = 0; i < suppliers.length; i++) {#}
+{#              supplierSelect.innerHTML += "<option value='" + suppliers[i].id + "'>" + suppliers[i].supplier_name + "</option>";#}
+{#            }#}
+{#          }#}
+{#        };#}
+{#        xhr2.send();#}
+{#      }#}
+{##}
+{#</script>#}
+{#</div>#}
+{#{% endblock %}#}
 {% extends "base.html" %}
 {% block content %}
+<div style="padding: 10px">
+    <button id="switch-language-btn" style="float:right; background-color:lightgreen;">Arabic</button>
+</div>
 
-<div class="container">
+
+<div class="container" style="text-align:center;">
     <form action="/submit_form/{{ form_id }}" method="post" onsubmit="return submitForm()">
-    <input type="hidden" name="farm_name" value="{{ form_id }}">
-        <table>
+    <input type="hidden" name="form_id" value="{{ form_id }}">
+        <table class="table table-striped">
             <thead>
                 <tr>
-                    <th>Farm Name:&nbsp&nbsp</th>
-                    <th>{{ farm_name }}</th>
+                    <th>Row Name</th>
+                    {% for column in column_names %}
+                        <th>{{ column }}</th>
+                    {% endfor %}
                 </tr>
             </thead>
             <tbody>
                 {% for row in row_names %}
                     <tr>
-                        <td>{{ row }}</td>
-                        {% if row == "Category" %}
-                            <td>
-                                <select id="categorySelect" onchange="updateSuppliers()">
-                                    {% for category in categories %}
-                                      <option value="{{ category.id }}">{{ category.category_name }}</option>
-                                    {% endfor %}
-                                </select>
-                            </td>
-                        {% elif row == "Type" %}
-                            <td>
-                                <select id="typeSelect" onchange="updateSuppliers()">
-                                </select>
-                            </td>
-                        {% elif row == "Supplier" %}
-                            <td>
-                                <select id="supplierSelect">
-                                </select>
-                            </td>
-                        {% else %}
-                            <td><input type="text" name="{{ row }}-{{ column_names }}"></td>
-                        {% endif %}
+                        <td id="{{ row }}-row-name">{{ row }}</td>
+                            {% for column in column_names %}
+                                <td><input type="text" name="{{ row }}-{{ column }}"></td>
+                            {% endfor %}
                     </tr>
                 {% endfor %}
             </tbody>
         </table>
-    <input type="submit" value="Submit">
+    <input type="submit" value="Submit" style="background-color:lightgreen;">
     </form>
-<script>
-    function updateSuppliers() {
-        var categorySelect = document.getElementById("categorySelect");
-        var categoryId = categorySelect.value;
-        var typeSelect = document.getElementById("typeSelect");
-        var xhr = new XMLHttpRequest();
-        xhr.open("GET", "/get_types_by_category_id/" + categoryId, true);
-        xhr.onreadystatechange = function() {
-          if (xhr.readyState === 4 && xhr.status === 200) {
-            var types = JSON.parse(xhr.responseText);
-            typeSelect.innerHTML = "";
-            for (var i = 0; i < types.length; i++) {
-              typeSelect.innerHTML += "<option value='" + types[i].id + "'>" + types[i].type + "</option>";
-            }
-          }
-        };
-        xhr.send();
+    <script>
+        const switchLanguageBtn = document.getElementById("switch-language-btn");
+        switchLanguageBtn.addEventListener("click", function() {
+            const rowNames = {{ row_names | tojson }};
+            const arabicRowNames = [];
+            // Translate the row names from English to Arabic and update the text content of the corresponding td elements
+            rowNames.forEach(function(rowName, index) {
+                arabicRowNames[index] = translateToArabic(rowName);
+                document.getElementById(`${rowName}-row-name`).textContent = arabicRowNames[index];
+            });
+        });
+        function submitForm() {
+            // Add form validation or any other logic here
+            return true;
+        }
+        function translateToArabic(text) {
+        const dictionary = {
+        "AVG Weight": "متوسط الوزن",
+        "Mortality": "النافق",
+        "Age": "العمر",
+        "Consumed Feed": "العلف المستهلك",
+        "Consumed Water": "الماء المستهلك",
+        "Feed Storage": "مخزون العلف",
+        "Light Time": "عدد ساعات الإضائة",
+        "Temperature": "درجة الحرارة",
+        "Vaccines Used": "اللقاحات المستخدمة",
+        "Vaccines Used Count": "عدد اللقاحات المستخدمة",
+        "Medicine Used": "الأدوية المستخدمة",
+        "Medicine Used Count": "عدد الأدوية المستخدمة",
+        "PH Level": "درجة ملوحة الماء",
+        "Feed Type": "نوع العلف"
+            };
 
-        var supplierSelect = document.getElementById("supplierSelect");
-        var typeId = typeSelect.value;
-        var xhr2 = new XMLHttpRequest();
-        xhr2.open("GET", "/get_suppliers_by_type_id/" + typeId, true);
-        xhr2.onreadystatechange = function() {
-          if (xhr2.readyState === 4 && xhr2.status === 200) {
-            var suppliers = JSON.parse(xhr2.responseText);
-            supplierSelect.innerHTML = "";
-            for (var i = 0; i < suppliers.length; i++) {
-              supplierSelect.innerHTML += "<option value='" + suppliers[i].id + "'>" + suppliers[i].supplier_name + "</option>";
-            }
-          }
-        };
-        xhr2.send();
-      }
-      function submitForm() {
-        // Add form validation or any other logic here
-        return true;
-      }
+        return dictionary[text] || text;
+        }
 </script>
 </div>
 {% endblock %}

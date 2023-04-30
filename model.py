@@ -167,11 +167,13 @@ class TemplateRow(db.Model):
     __tablename__ = 'template_row'
     template_id = Column(Integer, ForeignKey('template.template_id'), primary_key=True)
     row_title = Column(String, primary_key=True)
+    order = Column(Integer)
     __table_args__ = (PrimaryKeyConstraint(template_id, row_title),)
 
-    def __init__(self, template_id, row_name):
+    def __init__(self, template_id, row_name, order):
         self.template_id = template_id
         self.row_name = row_name
+        self.order = order
 
     def save(self):
         db.session.add(self)

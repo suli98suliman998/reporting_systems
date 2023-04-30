@@ -90,4 +90,34 @@ def set_avg_weight(forms_data):
             form_data["AVG Weight"] = value
     return forms_data
 
-# def validate_submitted_data(template_id, row_name, entered_value, calculated_value):
+
+def farm_warehouse_status(farm_name, cycle_number):
+    from model import Form
+    forms10 = Form.query.filter_by(farm_name=farm_name, cycle_number=cycle_number, template_id=10).all()
+    total_recieved_types_by_farm = get_total_recieved_types_by_farm(forms10)
+    return total_recieved_types_by_farm
+
+
+def get_total_recieved_types_by_farm(forms):
+    total_recieved_types_by_farm = {}
+    if forms:
+        for form in forms:
+            from model import SubmittedData
+            submitted_datas = SubmittedData.query.filter_by(template_id=form.template_id, form_id=form.form_id).all()
+            if submitted_datas:
+                for submitted_data in submitted_datas:
+                    if submitted_data.column_title == 'Type':
+                        type = submitted_data.data
+                        quantity = 0
+                        for submitted_data in submitted_datas:
+                            if submitted_data.column_title == 'Quantity':
+                                quantity = submitted_data.data
+                        if type not in total_recieved_types_by_farm:
+                            total_recieved_types_by_farm[type] = quantity
+                        else:
+                            current_quantity = int(total_recieved_types_by_farm[type])
+                            total_recieved_types_by_farm[type] = current_quantity + int(quantity)
+    return total_recieved_types_by_farm
+
+
+

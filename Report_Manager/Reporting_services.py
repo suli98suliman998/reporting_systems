@@ -8,8 +8,85 @@ from User.UserModel import get_user_info
 from model import Metadata, Form, FormColumns, TemplateRow, SubmittedData, db, Template
 
 
+def get_data_for_farm(farm_name, cycle_number):
+    form = Form.query.filter_by(farm_name=farm_name, cycle_number=cycle_number, template_id=5).order_by(
+        Form.form_id.desc()).first()
+    if not form:
+        return {}
+    form_id = form.form_id
+    submitted_data = {}
+    for SubmitedData in SubmittedData.query.filter_by(form_id=form_id).all():
+        value = SubmitedData.data
+        column_title = SubmitedData.column_title
+        key = column_title
+        submitted_data[key] = value
+    return submitted_data
+
+def translateToArabic(text):
+    if text == 'qudaid':
+        return 'قديد'
+def get_value_for_row(data, row):
+    print(111, data)
+    if data == {}:
+        return 'Nothing until now'
+    elif row == 'Mortalities Percentage':
+        total_mortalities = data['Total Mortalities']
+        total_occupation = data['Total Occupation']
+        mortality_percentage = (int(total_mortalities) / int(total_occupation)) * 100
+        return mortality_percentage
+    elif row == 'On Plan':
+        return 'true'
+    elif row == 'General Status':
+        return 'Good'
+    elif row == 'Farm Name':
+        return "non"
+
+    else:
+        return data[row]
+
+def build_totals_form(cycle_number):
+    template_id = 6
+    form_type = "Daily_Management"
+
+    from Report_Manager.FormModel import get_all_farms
+    farms = get_all_farms()
+
+    from Report_Manager.TemplateModel import get_row_titles_by_template_id
+    template_rows = get_row_titles_by_template_id(template_id)
+    from User.UserModel import get_user_info
+    user = get_user_info(1)  # later using session
+    filled_by = user["user_id"]
+
+    date = datetime.datetime.now().date()
+    time = int(datetime.datetime.now().time().hour.numerator)
+    title = form_type
+    metadata = Metadata(date=date, time=time, title=title)
+    metadata.save()
+
+    form = Form(template_id=template_id, filled_by=filled_by, farm_name='General', barn_number='All',
+                cycle_number=cycle_number, metadata_id=int(metadata.metadata_id))
+    form.save()
+
+    # Fetch the required data from the database and prepare it for rendering
+    column_names = []  # List to store farm names for the header
+    categories = {}  # Dictionary to store row data for each farm
+
+    for farm in farms:
+        column_names.append(farm)
+        categories[farm] = []
+        data = get_data_for_farm(farm, cycle_number)  # Fetch data for the given farm and cycle_number from the database
+        for row in template_rows:
+            print(row)
+            value = get_value_for_row(data, row)  # Fetch the value for the given row from the fetched data
+            print(value)
+            categories[f"{farm}-{row}"] = value
+    # print(template_rows)
+    # print(column_names)
+    return render_template('totals.html', form_id=form.form_id, farms=farms, row_names=template_rows,
+                           categories=categories)
+
+
 def build_delivery_note_form(farmName, cycle_number):
-    print(1)
     template_id = 10
     form_type = "Delivery_Note"
     from Report_Manager.TemplateModel import get_row_titles_by_template_id
@@ -22,48 +99,32 @@ def build_delivery_note_form(farmName, cycle_number):
     title = form_type
     metadata = Metadata(date=date, time=time, title=title)
     metadata.save()
-    print(111)
     form = Form(template_id=template_id, filled_by=filled_by, farm_name=farmName, barn_number='0',
                 cycle_number=cycle_number,
                 metadata_id=int(metadata.metadata_id))
     form.save()
+    print("form_id:", form.form_id)
     column = farmName
     new_form_column = FormColumns(form_id=form.form_id, column_title=str(column))
     new_form_column.save()
-    print(farmName)
     from categories.categoriesModel import get_categories
     categories = get_categories()
-    print(categories)
-    return render_template('delivery_note.html', farm_name=farmName, row_names=template_rows, categories=categories)
+    print(template_rows)
+    return render_template('delivery_note.html', form_id=form.form_id, farm_name=farmName, row_names=template_rows,
+                           column_names=[farmName], categories=categories)
 
 
-
-def get_form(form_type: str, cycle_number, columns):
-    # from Buisness_Logic.calculate_totals import get_total_of_specefic_row
+def get_form(form_type: str, cycle_number, columns, farm_name, barn_number):
     template_id = TemplateModel.get_template_id_by_type(form_type)
     template_rows = get_row_titles_by_template_id(template_id)
     user = get_user_info(1)  # later using session
     filled_by = user["user_id"]
-    farmName = user["farmName"]
-    barnNumber = user['houseNu']
+    farmName = farm_name
+    barnNumber = barn_number
     date = datetime.datetime.now().date()
     time = int(datetime.datetime.now().time().hour.numerator)
     title = form_type
     rows_data = {}
-    # data = get_data(farm_name=farmName, barn_number=barnNumber, cycle_number=cycle_number)
-    # for i in template_rows:
-    #     if data:
-    #         for k in data:
-    #             if k.get(i) is None:
-    #                 continue
-    #             else:
-    #                 # if i in ["Mortality", "Age", "Consumed Feed", "Arrived Mortalities", "First Week Mortalities",
-    #                 #          "Temperature", "Total Mortalities"]:
-    #                 sum = get_total_of_specefic_row(data, i)  # To be edited late
-    #                 rows_data[i] = sum
-    #                 # else:
-    #                 #     pass
-    #             break
     metadata = Metadata(date=date, time=time, title=title)
     metadata.save()
     form = Form(template_id=template_id, filled_by=filled_by, farm_name=farmName, barn_number=barnNumber,
@@ -76,7 +137,8 @@ def get_form(form_type: str, cycle_number, columns):
         new_form_column.save()
     from templates.translator import translate_to_arabic, translate_to_english
     return render_template('form_builder.html', form_id=form.form_id, column_names=form_columns,
-                           row_names=template_rows, rows_data=rows_data, translate_to_arabic=translate_to_arabic, translate_to_english=translate_to_english)
+                           row_names=template_rows, rows_data=rows_data, translate_to_arabic=translate_to_arabic,
+                           translate_to_english=translate_to_english)
 
 
 def get_labor_form(form_type, farm_name, barn_number, cycle_number, columns):
@@ -113,9 +175,12 @@ def submit_form(form_id):
         template_rows = FormColumns.query.filter_by(form_id=form_id).all()
         row_titles = [row.column_title for row in template_rows]
         for column in column_titles:
+            print("column", column)
             for row in row_titles:
+                print("row", row)
                 form_data = {}
                 data = form_data[column] = request.form.get(column + "-" + row)
+                print(data)
                 submitted_data = SubmittedData(template_id=template_id, column_title=column, form_id=form.form_id,
                                                row_title=row, data=data)
                 db.session.add(submitted_data)

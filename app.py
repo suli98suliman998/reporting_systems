@@ -65,13 +65,11 @@ def view_supervisor_pre_form():
     # add the measurement of the data
     if request.method == 'POST':
         farm_name = request.form.get("farm_name")
-        print(farm_name)
         cycle_number = request.form.get("cycle_number")
         barn_number = request.form.get("barn_number")
         columns = [barn_number]
-        print(columns)
         return redirect(
-            url_for('view_form', form_type='Daily_Farm_Supervisor', cycle_number=cycle_number, columns=columns))
+            url_for('view_form', form_type='Daily_Farm_Supervisor', cycle_number=cycle_number, columns=columns, farm_name=farm_name, barn_number=barn_number))
     from Report_Manager.FormModel import get_all_farms
     farms = get_all_farms()
     return render_template('daily_supervisor_pre_data.html', farms=farms)
@@ -79,7 +77,7 @@ def view_supervisor_pre_form():
 
 @app.route('/tech_pre_form', methods=['GET', 'POST'])
 def view_tech_pre_form():
-    if check_session('Farm Eng') == "Access Denied":
+    if check_session(['Farm Eng', 'Farm Supervisor']) == "Access Denied":
         return "Access Denied, You are not authorized to access this page"  # make a nice page view for it
 
     if request.method == 'POST':
@@ -90,7 +88,7 @@ def view_tech_pre_form():
         columns = [barn_number]
         print(columns)
         return redirect(
-            url_for('view_form', form_type='Daily_Farm_Tech', cycle_number=cycle_number, columns=columns))
+            url_for('view_form', form_type='Daily_Farm_Tech', cycle_number=cycle_number, columns=columns, farm_name=farm_name, barn_number=barn_number))
     from Report_Manager.FormModel import get_all_farms
     farms = get_all_farms()
     return render_template('daily_tech_pre_data.html', farms=farms)
@@ -98,8 +96,8 @@ def view_tech_pre_form():
 
 @app.route('/op_pre_form', methods=['GET', 'POST'])
 def view_op_pre_form():
-    if check_session('Operation Manager') == "Access Denied":
-        return "Access Denied, You are not authorized to access this page"  # make a nice page view for it
+    # if check_session('Operation Manager') == "Access Denied":
+    #     return "Access Denied, You are not authorized to access this page"  # make a nice page view for it
 
     if request.method == 'POST':
         farm_name = request.form.get("farm_name")
@@ -109,7 +107,7 @@ def view_op_pre_form():
         columns = [barn_number]
         print(columns)
         return redirect(
-            url_for('view_form', form_type='Daily_OP', cycle_number=cycle_number, columns=columns))
+            url_for('view_form', form_type='Daily_OP', cycle_number=cycle_number, columns=columns, farm_name=farm_name, barn_number=barn_number))
     from Report_Manager.FormModel import get_all_farms
     farms = get_all_farms()
     return render_template('daily_op_pre_data.html', farms=farms)
@@ -123,7 +121,7 @@ def view_farm_pre_form():
         barn_number = request.form.get("barn_number")
         columns = [barn_number]
         return redirect(
-            url_for('view_form', form_type='Daily_Farm', cycle_number=cycle_number, columns=columns))
+            url_for('view_form', form_type='Daily_Farm', cycle_number=cycle_number, columns=columns, farm_name=farm_name, barn_number=barn_number))
     from Report_Manager.FormModel import get_all_farms
     farms = get_all_farms()
     return render_template('daily_farm_pre_data.html', farms=farms)
@@ -143,16 +141,19 @@ def view_labor_form():
 
 @app.route('/form/<form_type>', methods=['GET', 'POST'])
 def view_form(form_type):
+    farm_name = request.args.get('farm_name')
+    barn_number = request.args.get('barn_number')
     cycle_number = request.args.get('cycle_number')
     columns = request.args.getlist('columns')
     from Report_Manager.Reporting_services import get_form
     print(columns)
-    return get_form(form_type=form_type, cycle_number=cycle_number, columns=columns)
+    return get_form(form_type=form_type, cycle_number=cycle_number, columns=columns, farm_name=farm_name, barn_number=barn_number)
 
 
 @app.route('/submit_form/<form_id>', methods=['POST'])
 def submit_form_data(form_id):
     from Report_Manager.Reporting_services import submit_form
+    print("from app.py", form_id)
     return submit_form(form_id)
 
 
@@ -192,14 +193,13 @@ def get_types(category_id):
     types_dict = [dict(id=type.id, type=type.type) for type in types]
     return jsonify(types_dict)
 
+
 @app.route('/get_suppliers_by_type_id/<type_id>', methods=['GET', 'POST'])
 def get_suppliers(type_id):
     from categories.categoriesModel import get_suppliers_by_type_id
     suppliers = get_suppliers_by_type_id(type_id)
     types_dict = [dict(id=supplier.id, supplier_name=supplier.supplier_name) for supplier in suppliers]
     return jsonify(types_dict)
-
-
 
 
 @app.route('/view_data', methods=['GET', 'POST'])
@@ -263,8 +263,10 @@ def get_forms_data():
 def view_form_id(form_id):
     if request.method == 'POST':
         submitted_data = SubmittedData.query.filter_by(form_id=form_id).first()
+        print(submitted_data)
         new_value = request.form.get(
             f"{submitted_data.template_id}_{submitted_data.row_title}_{submitted_data.form_id}_{submitted_data.column_title}")
+        print(new_value)
         if new_value:
             submitted_data.data = new_value
             db.session.commit()
@@ -353,6 +355,44 @@ def modify_row(row_id):
     # perform the action for modifying the specific row
     print("modify")
     pass
+
+
+@app.route('/pre_warehouse', methods=['GET', 'POST'])
+def view_pre_warehouse():
+    if request.method == 'POST':
+        farm_name = request.form.get("farm_name")
+        cycle_number = request.form.get("cycle_number")
+        return redirect(url_for('view_warehouse', farm_name=farm_name, cycle_number=cycle_number))
+    from Report_Manager.FormModel import get_all_farms
+    farms = get_all_farms()
+    return render_template("pre_warehouse.html", farms=farms)
+
+
+@app.route('/warehouse', methods=['GET', 'POST'])
+def view_warehouse():
+    farm_name = request.args.get('farm_name')
+    cycle_number = request.args.get('cycle_number')
+    from Buisness_Logic.calculate_totals import farm_warehouse_status
+    types = farm_warehouse_status(farm_name=farm_name, cycle_number=cycle_number)
+    types_list = [{'type': k, 'quantity': v} for k, v in types.items()]
+    return render_template("warehouse.html", types=types_list)
+
+
+@app.route('/totals_pre_form', methods=['GET', 'POST'])
+def view_totals_pre_form():
+    if request.method == 'POST':
+        cycle_number = request.form.get("cycle_number")
+        return redirect(
+            url_for('view_totals_form', cycle_number=cycle_number))
+    return render_template('totals_pre_form.html')
+
+
+@app.route('/form/totals', methods=['GET', 'POST'])
+def view_totals_form():
+    cycle_number = request.args.get('cycle_number')
+    print(cycle_number)
+    from Report_Manager.Reporting_services import build_totals_form
+    return build_totals_form(cycle_number=cycle_number)
 
 
 if __name__ == '__main__':

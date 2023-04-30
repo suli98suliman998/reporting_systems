@@ -11,7 +11,6 @@ def get_form_columns_by_form_id(form_id):
 def get_all_farms():
     farms = Farm.query.with_entities(Farm.farm_name).all()
     farm_list = [farm[0] for farm in farms]
-    print(farm_list)
     return farm_list
 
 
@@ -26,5 +25,9 @@ def get_forms_by_cycle_number(cycle_number, farm_name, barn_number):
     forms = Form.query.filter_by(cycle_number=cycle_number, farm_name=farm_name, barn_number=barn_number).all
     return forms
 
+
+def get_forms_by_farm_name_cycle_number_delivery_note(farm_name, cycle_number):
+    forms = Form.query.filter_by(cycle_number=cycle_number, farm_name=farm_name).all
+    return forms
 
 
