@@ -1,4 +1,4 @@
-from flask import jsonify, render_template, request, url_for, redirect
+from flask import jsonify, render_template, request, url_for, redirect, session
 
 from functions import check_session
 from model import app, Farm, SubmittedData, db
@@ -279,6 +279,9 @@ def view_form_id(form_id):
 
 @app.route('/dashboard')
 def dashboard():
+    from Report_Manager.Reporting_services import get_data_for_farm
+    print(get_data_for_farm('thoual', '1'))
+    print(session['user_id'])
     return render_template('index.html')
 
 
@@ -288,9 +291,26 @@ def labor_dashboard():
 
 
 @app.route('/')
-def pp():
-    print("oopp")
+def loginPage():
+    # Check if user is already logged in
+    if 'user_id' in session:
+        current_user_id = session['user_id']
+        from User.UserModel import get_user_info
+        current_session_user = get_user_info(current_user_id)
+        print(current_session_user['jobTitle'])
+        if current_session_user['jobTitle'] == 'Labor':
+            return redirect(url_for('labor_dashboard'))
+        else:
+            return redirect(url_for('dashboard'))
     return render_template('login.html')
+
+
+@app.route('/logout')
+def logout():
+    # Remove user_id from session to log the user out
+    session.pop('user_id', None)
+    # Redirect the user to the login page
+    return redirect(url_for('loginPage'))
 
 
 @app.route('/register_user', methods=['GET', 'POST'])
@@ -307,7 +327,9 @@ def view_labor_registration():
 
 @app.route('/login', methods=['GET', 'POST'])
 def view_login():
-    print(11)
+    # Check if user is already logged in
+    if 'user_id' in session:
+        return redirect(url_for('dashboard'))
     from User.UserController import controller_login
     return controller_login()
 

@@ -6,47 +6,78 @@
     <!-- Latest compiled JavaScript -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <style>
+        .navbar-default {
+              background-color: black;
+              border-color: black;
+            }
+            .navbar-default .navbar-brand,
+            .navbar-default .navbar-nav > li > a {
+              color: white;
+            }
+            .navbar-default .navbar-brand:hover,
+            .navbar-default .navbar-nav > li > a:hover {
+              color: #d4af37; /* iron color */
+            }
+            .navbar-logo {
+              position: absolute;
+              top: 5px;
+              right: 5px;
+              width: 50px;
+              height: 50px;
+            }
 
+
+    </style>
   </head>
   <body>
     <header>
       <nav class="navbar navbar-default">
+          <div class="navbar-header">
+              <img src="img.png" class="navbar-logo">
+              <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <i class="glyphicon glyphicon-align-justify"></i>
+              </button>
+          </div>
+
           <div class="container-fluid">
             <div class="navbar-header">
               <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
                 <span class="sr-only">Toggle navigation</span>
                 <i class="glyphicon glyphicon-align-justify"></i>
               </button>
-              <a class="navbar-brand" href="{{ url_for('dashboard') }}">Daily Report</a>
+              <a class="navbar-brand" href="{{ url_for('dashboard') }}">Dashboard</a>
             </div>
             <div id="navbar" class="navbar-collapse collapse">
               <ul class="nav navbar-nav">
-              <li><a href="/dashboard">Home</a></li>
-              <li><a href="/view_data">Get Data</a></li>
-                  <li><a href="/get_forms_data">Get Forms</a></li>
-              <li><a href="/generate_qr">Make QR</a></li>
-              <li><a href="/categories">Suppliers Categories</a></li>
-              <li><a href="/pre_warehouse">Farms Warehouse</a></li>
+              <li><a href="/dashboard">الصفحة الرئيسية</a></li>
+              <li><a href="/view_data">مراجعة المدخلات</a></li>
+                  <li><a href="/get_forms_data">مراجعة النماذج</a></li>
+              <li><a href="/generate_qr">QR Code</a></li>
+              <li><a href="/categories">الموردين والمشتريات</a></li>
+              <li><a href="/pre_warehouse">مستودع المزارع</a></li>
               <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Users <span class="caret"></span></a>
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">إدارة المستخدمين <span class="caret"></span></a>
                 <ul class="dropdown-menu">
-                  <li><a href="{{ url_for('view_user_registration') }}">Create User</a></li>
-                  <li><a href="{{ url_for('view_labor_registration') }}">Create Labor</a></li>
+                  <li><a href="{{ url_for('view_user_registration') }}">إنشاء مستخدم إداري</a></li>
+                  <li><a href="{{ url_for('view_labor_registration') }}">إنشاء مستخدم عامل</a></li>
                 </ul>
               </li>
               <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Forms <span class="caret"></span></a>
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">النماذج <span class="caret"></span></a>
                 <ul class="dropdown-menu">
-                  <li><a href="/labor_pre_form">Daily Labor Form</a></li>
-                    <li><a href="/supervisor_pre_form">Daily Supervisor Form</a></li>
-                    <li><a href="/tech_pre_form">Daily Tech Form</a></li>
-                    <li><a href="/farm_pre_form">Daily Farm Form</a></li>
-                    <li><a href="/op_pre_form">Daily Operation Form</a></li>
-                    <li><a href="/totals_pre_form">Management Form</a></li>
+                  <li><a href="/labor_pre_form">تقرير الحظائر</a></li>
+                    <li><a href="/supervisor_pre_form">تقريرالإشرافي للمزارع</a></li>
+                    <li><a href="/tech_pre_form">تقرير فني للمزارع</a></li>
+                    <li><a href="/farm_pre_form">تقرير المزرعة</a></li>
+                    <li><a href="/op_pre_form">تقرير التشغيل-التسويق</a></li>
+                    <li><a href="/totals_pre_form">تقرير الإدارة</a></li>
                     <li><a href="/delivery_note_pre_form">Delivery Note</a></li>
 
                 </ul>
               </li>
+               <li><a href="/logout">تسجيل خروج</a></li>
             </ul>
             </div>
           </div>

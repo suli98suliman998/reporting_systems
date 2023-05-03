@@ -9,24 +9,45 @@ from model import Metadata, Form, FormColumns, TemplateRow, SubmittedData, db, T
 
 
 def get_data_for_farm(farm_name, cycle_number):
-    form = Form.query.filter_by(farm_name=farm_name, cycle_number=cycle_number, template_id=5).order_by(
-        Form.form_id.desc()).first()
-    if not form:
+    forms = Form.query.filter_by(farm_name=farm_name, cycle_number=cycle_number, template_id=5).order_by(
+        Form.form_id.desc()).all()
+    if not forms:
         return {}
-    form_id = form.form_id
     submitted_data = {}
-    for SubmitedData in SubmittedData.query.filter_by(form_id=form_id).all():
-        value = SubmitedData.data
-        column_title = SubmitedData.column_title
-        key = column_title
-        submitted_data[key] = value
+    for form in forms:
+        form_id = form.form_id
+        for SubmitedData in SubmittedData.query.filter_by(form_id=form_id).all():
+            value = SubmitedData.data
+            column_title = SubmitedData.column_title
+            key = column_title
+            if key == 'Total Occupation' or key == 'Total Mortalities':
+                try:
+                    submitted_data[key] = int(submitted_data[key]) + int(value)
+                except:
+                    submitted_data[key] = value
+            elif key == 'Age':
+                try:
+                    if int(submitted_data[key]) < int(value):
+                        submitted_data[key] = value
+                except:
+                    submitted_data[key] = value
+            elif key == 'Left Chicks':
+                try:
+                    submitted_data[key] = int(submitted_data['Total Occupation']) - int(
+                        submitted_data['Total Mortalities'])
+                except:
+                    submitted_data[key] = value
+            else:
+                submitted_data[key] = value
     return submitted_data
+
 
 def translateToArabic(text):
     if text == 'qudaid':
         return 'قديد'
+
+
 def get_value_for_row(data, row):
-    print(111, data)
     if data == {}:
         return 'Nothing until now'
     elif row == 'Mortalities Percentage':
@@ -43,6 +64,7 @@ def get_value_for_row(data, row):
 
     else:
         return data[row]
+
 
 def build_totals_form(cycle_number):
     template_id = 6
@@ -76,12 +98,8 @@ def build_totals_form(cycle_number):
         categories[farm] = []
         data = get_data_for_farm(farm, cycle_number)  # Fetch data for the given farm and cycle_number from the database
         for row in template_rows:
-            print(row)
             value = get_value_for_row(data, row)  # Fetch the value for the given row from the fetched data
-            print(value)
             categories[f"{farm}-{row}"] = value
-    # print(template_rows)
-    # print(column_names)
     return render_template('totals.html', form_id=form.form_id, farms=farms, row_names=template_rows,
                            categories=categories)
 
@@ -103,13 +121,11 @@ def build_delivery_note_form(farmName, cycle_number):
                 cycle_number=cycle_number,
                 metadata_id=int(metadata.metadata_id))
     form.save()
-    print("form_id:", form.form_id)
     column = farmName
     new_form_column = FormColumns(form_id=form.form_id, column_title=str(column))
     new_form_column.save()
     from categories.categoriesModel import get_categories
     categories = get_categories()
-    print(template_rows)
     return render_template('delivery_note.html', form_id=form.form_id, farm_name=farmName, row_names=template_rows,
                            column_names=[farmName], categories=categories)
 
@@ -175,12 +191,9 @@ def submit_form(form_id):
         template_rows = FormColumns.query.filter_by(form_id=form_id).all()
         row_titles = [row.column_title for row in template_rows]
         for column in column_titles:
-            print("column", column)
             for row in row_titles:
-                print("row", row)
                 form_data = {}
                 data = form_data[column] = request.form.get(column + "-" + row)
-                print(data)
                 submitted_data = SubmittedData(template_id=template_id, column_title=column, form_id=form.form_id,
                                                row_title=row, data=data)
                 db.session.add(submitted_data)
@@ -243,7 +256,6 @@ def get_data(farm_name, barn_number, cycle_number):
             form_columns = FormColumns.query.filter_by(form_id=form.form_id).all()
             for form_column in form_columns:
                 for form_row in form_rows:
-                    print(form_row)
                     data = get_submitted_data(template_id=form.template_id,
                                               row_title=form_column.column_title,
                                               form_id=form.form_id,
