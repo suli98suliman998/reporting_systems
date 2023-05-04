@@ -1,8 +1,10 @@
 from flask import jsonify, render_template, request, url_for, redirect, session
-
-from functions import check_session
 from model import app, Farm, SubmittedData, db
+import os
 
+port = int(os.environ.get('PORT', 5000))
+
+app.run(host='0.0.0.0', port=port, debug=True)
 
 @app.route("/get_barn_count", methods=["POST"])
 def get_barn_count():
