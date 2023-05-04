@@ -5,12 +5,12 @@ from flask_sqlalchemy import SQLAlchemy
 from marshmallow_sqlalchemy import SQLAlchemyAutoSchema
 from sqlalchemy import Column, Integer, ForeignKey, String, PrimaryKeyConstraint, Enum, DateTime
 
-basedir = os.path.abspath(os.path.dirname(__file__))
+basedir = 'reporting_systems'
 
 app = Flask(__name__)
 app.secret_key = 'IM_THE_BEST'
 app.config['SQLALCHEMY_DATABASE_URI'] = \
-    'sqlite:///' + os.path.join(basedir, 'database.db')
+    'sqlite:///' + '../database.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 

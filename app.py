@@ -4,22 +4,6 @@ from functions import check_session
 from model import app, Farm, SubmittedData, db
 
 
-# def get_hour(time_string):
-#     return int(time_string.split(':')[0])
-#
-#
-# def is_between(shift):
-#     current_time = datetime.datetime.now().hour
-#     start_time, end_time = shift.split(" to ")
-#     start_hour = int(start_time.split(':')[0])
-#     end_hour = int(end_time.split(':')[0])
-#     print(start_hour)
-#     print(end_hour)
-#     if start_hour <= end_hour:
-#         return start_hour <= current_time <= end_hour
-#     else:  # start_hour > end_hour, assuming end hour is next day
-#         return current_time >= start_hour or current_time <= end_hour
-
 @app.route("/get_barn_count", methods=["POST"])
 def get_barn_count():
     data = request.get_json()
@@ -42,8 +26,8 @@ def generate_qr():
 
 @app.route('/labor_pre_form', methods=['GET', 'POST'])
 def view_labor_pre_form():
-    if check_session('Labor') == "Access Denied":
-        return "Access Denied, You are not authorized to access this page"  # make a nice page view for it
+    # if check_session('Labor') == "Access Denied":
+    #     return "Access Denied, You are not authorized to access this page"  # make a nice page view for it
 
     from Report_Manager.Reporting_services import get_shift
     shift = get_shift()
@@ -59,8 +43,8 @@ def view_labor_pre_form():
 
 @app.route('/supervisor_pre_form', methods=['GET', 'POST'])
 def view_supervisor_pre_form():
-    if check_session('Farm Supervisor') == "Access Denied":
-        return "Access Denied, You are not authorized to access this page"  # make a nice page view for it
+    # if check_session('Farm Supervisor') == "Access Denied":
+    #     return "Access Denied, You are not authorized to access this page"  # make a nice page view for it
 
     # add the measurement of the data
     if request.method == 'POST':
@@ -77,8 +61,8 @@ def view_supervisor_pre_form():
 
 @app.route('/tech_pre_form', methods=['GET', 'POST'])
 def view_tech_pre_form():
-    if check_session(['Farm Eng', 'Farm Supervisor']) == "Access Denied":
-        return "Access Denied, You are not authorized to access this page"  # make a nice page view for it
+    # if check_session(['Farm Eng', 'Farm Supervisor']) == "Access Denied":
+    #     return "Access Denied, You are not authorized to access this page"  # make a nice page view for it
 
     if request.method == 'POST':
         farm_name = request.form.get("farm_name")
@@ -418,4 +402,6 @@ def view_totals_form():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000)
+    app.debug = True
+

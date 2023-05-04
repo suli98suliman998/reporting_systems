@@ -1,37 +1,65 @@
-<html>
-    <head>
-        <title>Daily Report</title>
-        <!-- Latest compiled and minified CSS -->
-        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-        <!-- Latest compiled JavaScript -->
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-        <style>
-            .container {
-                  display: flex;
-                  flex-direction: column;
-                  justify-content: center;
-                  align-items: center;
-                  height: 100vh;
-                  padding: 30px;
-                  width: 100%;
-                  box-sizing: border-box;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="container">
-            <form action="/login" method="post">
-                <div class="form-group">
-                    <label for="username"><span class="text-danger">*</span>Username:</label>
-                    <input type="text" class="form-control" name="username" required><br>
-                </div>
-                <div class="form-group">
-                    <label for="password"><span class="text-danger">*</span>Password:</label>
-                    <input type="password" class="form-control" name="password" required><br>
-                </div>
-                <button type="submit" class="btn btn-default">Login</button>
-            </form>
-        </div>
-    </body>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title></title>
+    <!-- Design by foolishdeveloper.com -->
+    <link href="../static/log.css" rel="stylesheet" />
+    <script src="../static/Login.js"></script>
+
+
+</head>
+<body >
+<script  src="https://code.jquery.com/jquery-3.1.1.min.js"  integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8="  crossorigin="anonymous"></script>
+	<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" ></script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous"/>
+
+<div class="body">
+		<div class="veen">
+			<div class="login-btn splits">
+				<p>Already an user?</p>
+				<button class="active">Login</button>
+			</div>
+			<div class="rgstr-btn splits">
+			  <img src="static/logo.png" />
+			</div>
+			<div class="wrapper">
+				<form action="/login" method="post" id="login" tabindex="500" >
+					<h3>Login</h3>
+					<div class="mail">
+						<input type="text" class="format-control" name="username" required>
+						<label>Username</label>
+					</div>
+					<div class="passwd">
+
+						<input type="text" class="format-control" name="password" required>
+						<label>Password</label>
+					</div>
+					<div class="submit button1">
+                        <button type="submit" class="dark button1">Login</button>
+					</div>
+				</form>
+
+			</div>
+		</div>
+	</div>
+
+
+	<style type="text/css">
+		.site-link{
+      padding: 5px 15px;
+			position: fixed;
+			z-index: 99999;
+			background: #fff;
+			box-shadow: 0 0 4px rgba(0,0,0,.14), 0 4px 8px rgba(0,0,0,.28);
+			right: 30px;
+			bottom: 30px;
+			border-radius: 10px;
+		}
+		.site-link img{
+			width: 30px;
+			height: 30px;
+		}
+	</style>
+
+</body>
+
 </html>
